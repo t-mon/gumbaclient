@@ -12,6 +12,8 @@ public:
     explicit TcpClient(QObject *parent = 0);
 
 signals:
+    void newLineToParse(const QString &line);
+
     void obstacleLeft(const bool &obstacleState);
     void obstacleRight(const bool &obstacleState);
     void bumperLeftPressd(const bool &bumperState);
@@ -31,17 +33,20 @@ signals:
 
 private:
     QTcpSocket *tcpSocket;
+    QString m_tcpBuffer;
 
 private slots:
     void connectedToHost();
     void connectionError(QAbstractSocket::SocketError error);
     void readData();
+    void parseLine(const QString &line);
     void readGumbaData(QString sensorString);
 
 public slots:
     void connectToHost(QString ipAddress, QString port);
     void disconnectFromHost();
     void sendData(QString target, QString command);
+
 
 
 };

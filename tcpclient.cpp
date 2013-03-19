@@ -16,6 +16,8 @@ TcpClient::TcpClient(QObject *parent) :
     connect(tcpSocket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(connectionError(QAbstractSocket::SocketError)));
     connect(tcpSocket, SIGNAL(connected()),this, SLOT(connectedToHost()));
     connect(tcpSocket,SIGNAL(readyRead()),this,SLOT(readData()));
+    connect(this,SIGNAL(newLineToParse(QString)),this,SLOT(parseLine(QString)));
+
 
     connect(this,SIGNAL(gumbaDataRecived(QString)),this,SLOT(readGumbaData(QString)));
 
@@ -32,14 +34,14 @@ void TcpClient::connectedToHost(){
 
     qDebug() << "-->connected to server. OK";
     emit connectionStatusChanged(true);
-    emit writeToTerminal("-->connected to server. OK");
+    emit writeToTerminal("--->connected to server. OK");
 }
 
 void TcpClient::connectionError(QAbstractSocket::SocketError error)
 {
     qDebug() << "connection error" << error;
     emit connectionStatusChanged(false);
-    emit writeToTerminal("-->connection error.");
+    emit writeToTerminal("---> connection error");
 }
 
 void TcpClient::disconnectFromHost(){
@@ -58,17 +60,31 @@ void TcpClient::sendData(QString target, QString command){
     QJson::Serializer serializer;
     QByteArray dataOut = serializer.serialize(map);
     qDebug() << "-->Send Data: " << dataOut;
-    tcpSocket->write(dataOut);
+    tcpSocket->write(dataOut+"\n");
+    tcpSocket->flush();
 }
 
 void TcpClient::readData(){
     QByteArray dataIn;
 
-    dataIn = tcpSocket->readAll();
+    m_tcpBuffer.append(tcpSocket->readAll());
+    while(!m_tcpBuffer.isEmpty()){
+        int newLinePositionPackage = m_tcpBuffer.indexOf('\n') + 1;
+        qDebug() << "----> data to parse: " << m_tcpBuffer.left(newLinePositionPackage);
 
+        emit newLineToParse(m_tcpBuffer.left(newLinePositionPackage));
+        m_tcpBuffer = m_tcpBuffer.right((m_tcpBuffer.length() - newLinePositionPackage));
+    }
+    qDebug() << "----> got message: " << dataIn;
+
+
+}
+
+void TcpClient::parseLine(const QString &line)
+{
     QVariantMap map;
     QJson::Parser parser;
-    map = parser.parse(dataIn).toMap();
+    map = parser.parse(line.toAscii()).toMap();
     if(map.value("target").toString() == "Terminal"){
         emit writeToTerminal(map.value("command").toString());
     }
@@ -95,15 +111,6 @@ void TcpClient::readGumbaData(QString gumbaString)
                 double lightL = sensors.value("energy").toMap().value("light_l").toDouble();
 
                 ubat = ubat/100;
-//                if (ubat != 0){
-//                    if(ubat > 5.8){
-//                        ui->bateryLineEdit->setStyleSheet("background-color:green;");
-//                    }else if (ubat <= 5.8){
-//                        ui->bateryLineEdit->setStyleSheet("background-color:red;");
-//                    }
-//                    ui->bateryLineEdit->clear();
-//                    ui->bateryLineEdit->setText(QString::number(ubat) +"V");
-//                }
 
                 emit motorLeft(iMotorL);
                 emit motorRight(iMotorR);
@@ -111,11 +118,6 @@ void TcpClient::readGumbaData(QString gumbaString)
                 emit lightRight(lightR);
                 emit batteryVoltage(ubat);
 
-//                qDebug() << "Batery Voltage: " << ubat;
-//                qDebug() << "Motor right: " << iMotorR;
-//                qDebug() << "Motor left: " << iMotorL;
-//                qDebug() << "Light right: " << lightR;
-//                qDebug() << "Light left: " << lightL;
             }
         }
 

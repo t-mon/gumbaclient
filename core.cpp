@@ -6,7 +6,7 @@ Core::Core(QObject *parent) :
     m_mainwindow = new MainWindow();
     m_mainwindow->show();
 
-    m_wiimote = new WiiMote(this);
+    m_wiimote = new QWiiMote(this);
 
     m_client = new TcpClient(this);
 

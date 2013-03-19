@@ -4,24 +4,25 @@
 #
 #-------------------------------------------------
 
-QT       += core gui network multimedia
+QT       += core gui network
 
 TARGET = gumbaclient
 TEMPLATE = app
 
 LIBS += -lqjson
-#-L/home/timon/development/wiic/build/wiicpp/
-
+#-L/usr/local/lib/*wii
 #INCLUDEPATH += /usr/local/include/wiic/
 
 SOURCES += main.cpp\
     mainwindow.cpp \
     core.cpp \
     tcpclient.cpp \
-    wiimote.cpp
+    qwiimote.cpp \
+    robotarm.cpp
 
 HEADERS  += mainwindow.h \
     core.h \
     tcpclient.h \
-    wiimote.h
+    qwiimote.h \
+    robotarm.h
 

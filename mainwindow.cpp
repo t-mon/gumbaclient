@@ -9,6 +9,14 @@
 #include <QKeyEvent>
 
 
+// up-limit     = 249 ms = +90
+// down-limit   = 57  ms = -90
+#define upLimitBig 243
+#define downLimitBig 57
+#define upLimitSmall 227
+#define downLimitSmall 50
+#define periodMove 5000
+
 #include "mainwindow.h"
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -35,22 +43,18 @@ MainWindow::MainWindow(QWidget *parent) :
     QPushButton *connectGumbaButton = new QPushButton("Connect Gumba");
     connectGumbaButton->setFixedWidth(150);
     gridLayout->addWidget(connectGumbaButton,0,0);
-    connect(connectGumbaButton,SIGNAL(clicked()),this,SLOT(connectGumbaClicked()));
 
     QPushButton *disconnectGumbaButton = new QPushButton("Disconnect Gumba");
     disconnectGumbaButton->setFixedWidth(150);
     gridLayout->addWidget(disconnectGumbaButton,1,0);
-    connect(disconnectGumbaButton,SIGNAL(clicked()),this,SLOT(disconnectGumbaClicked()));
 
     QPushButton *startGumbaApplicationButton = new QPushButton("Start Gumba");
     startGumbaApplicationButton->setFixedWidth(150);
     gridLayout->addWidget(startGumbaApplicationButton,0,3);
-    connect(startGumbaApplicationButton,SIGNAL(clicked()),this,SLOT(startGumbaApplicationClicked()));
 
     QPushButton *toggleRTSButton = new QPushButton("Toggle RTS");
     toggleRTSButton->setFixedWidth(150);
     gridLayout->addWidget(toggleRTSButton,1,3);
-    connect(toggleRTSButton,SIGNAL(clicked()),this,SLOT(toggleRTSClicked()));
 
     // Sensor status
     bumperLeftLabel = new QLabel(this);
@@ -85,37 +89,27 @@ MainWindow::MainWindow(QWidget *parent) :
     motorLeftLabel = new QLabel(this);
     motorLeftLabel->setFixedWidth(90);
     gridLayout->addWidget(motorLeftLabel,0,6);
-    //motorLeftLabel->setAlignment(Qt::AlignCenter);
     motorLeftLabel->setText("Motor L: 0");
-    //motorLeftLabel->setStyleSheet("background-color:gray; border-radius: 5px;");
 
     motorRightLabel = new QLabel(this);
     motorRightLabel->setFixedWidth(90);
     gridLayout->addWidget(motorRightLabel,0,7);
-    //motorRightLabel->setAlignment(Qt::AlignCenter);
     motorRightLabel->setText("Motor R: 0");
-    //motorRightLabel->setStyleSheet("background-color:gray; border-radius: 5px;");
 
     lightLeftLabel = new QLabel(this);
     lightLeftLabel->setFixedWidth(90);
     gridLayout->addWidget(lightLeftLabel,1,6);
-    //lightLeftLabel->setAlignment(Qt::AlignCenter);
     lightLeftLabel->setText("Light L: 0");
-    //lightLeftLabel->setStyleSheet("background-color:gray; border-radius: 5px;");
 
     lightRightLabel = new QLabel(this);
     lightRightLabel->setFixedWidth(90);
     gridLayout->addWidget(lightRightLabel,1,7);
-    //lightRightLabel->setAlignment(Qt::AlignCenter);
     lightRightLabel->setText("Light R: 0");
-    //lightRightLabel->setStyleSheet("background-color:gray; border-radius: 5px;");
 
     batteryLabel = new QLabel(this);
     batteryLabel->setFixedWidth(90);
     gridLayout->addWidget(batteryLabel,2,0);
-    //batteryLabel->setAlignment(Qt::AlignCenter);
     batteryLabel->setText("0 V");
-    //batteryLabel->setStyleSheet("background-color:gray; border-radius: 5px;");
 
     velocitySlider = new QSlider(Qt::Horizontal, this);
     velocitySlider->setFixedWidth(100);
@@ -123,12 +117,104 @@ MainWindow::MainWindow(QWidget *parent) :
     velocitySlider->setTickInterval(1);
     velocitySlider->setMinimum(1);
     velocitySlider->setMaximum(4);
-    connect(velocitySlider,SIGNAL(sliderMoved(int)),this,SLOT(velocitySliderChanged(int)));
+
+    velocityLabel = new QLabel(this);
+    velocityLabel->setFixedWidth(90);
+    gridLayout->addWidget(velocityLabel,4,0);
+    velocityLabel->setAlignment(Qt::AlignCenter);
+    velocityLabel->setText("v=0");
 
 
+    QPushButton *initServo = new QPushButton("Servo init");
+    initServo->setFixedWidth(150);
+    gridLayout->addWidget(initServo,4,1);
 
 
+    QPushButton *servoAllPwmOff = new QPushButton("All Servos OFF");
+    servoAllPwmOff->setFixedWidth(150);
+    gridLayout->addWidget(servoAllPwmOff,5,1);
 
+    // Servo number    GPIO number   Pin in P1 header
+    //      0               4             P1-7
+    //      1              17             P1-11
+    //      2              18             P1-12
+    //      3              21             P1-13
+    //      4              22             P1-15
+    //      5              23             P1-16
+    //      6              24             P1-18
+    //      7              25             P1-22
+
+    servo0Slider = new QSlider(Qt::Horizontal, this);
+    servo0Slider->setFixedWidth(150);
+    gridLayout->addWidget(servo0Slider,2,2);
+    servo0Slider->setTickInterval(1);
+    servo0Slider->setMinimum(downLimitSmall);
+    servo0Slider->setMaximum(upLimitSmall);
+    servo0Slider->setValue(downLimitSmall);
+
+    servo0Label = new QLabel(this);
+    servo0Label->setFixedWidth(150);
+    gridLayout->addWidget(servo0Label,3,2);
+    servo0Label->setAlignment(Qt::AlignCenter);
+    servo0Label->setText("S0 = ");
+
+    servo1Slider = new QSlider(Qt::Horizontal, this);
+    servo1Slider->setFixedWidth(150);
+    gridLayout->addWidget(servo1Slider,2,3);
+    servo1Slider->setTickInterval(1);
+    servo1Slider->setMinimum(downLimitBig);
+    servo1Slider->setMaximum(upLimitBig);
+    servo1Slider->setValue(downLimitBig);
+
+    servo1Label = new QLabel(this);
+    servo1Label->setFixedWidth(150);
+    gridLayout->addWidget(servo1Label,3,3);
+    servo1Label->setAlignment(Qt::AlignCenter);
+    servo1Label->setText("S1 = ");
+
+
+    servo2Slider = new QSlider(Qt::Horizontal, this);
+    servo2Slider->setFixedWidth(150);
+    gridLayout->addWidget(servo2Slider,2,4);
+    servo2Slider->setTickInterval(1);
+    servo2Slider->setMinimum(downLimitBig);
+    servo2Slider->setMaximum(upLimitBig);
+    servo2Slider->setValue(downLimitBig);
+
+    servo2Label = new QLabel(this);
+    servo2Label->setFixedWidth(150);
+    gridLayout->addWidget(servo2Label,3,4);
+    servo2Label->setAlignment(Qt::AlignCenter);
+    servo2Label->setText("S2 = ");
+
+    QPushButton *servo0animationButton = new QPushButton("Start animation");
+    servo0animationButton->setFixedWidth(150);
+    gridLayout->addWidget(servo0animationButton,4,2);
+
+    QPushButton *servo0poweOffButton = new QPushButton("Power OFF");
+    servo0poweOffButton->setFixedWidth(150);
+    gridLayout->addWidget(servo0poweOffButton,5,2);
+
+    QPushButton *servo1animationButton = new QPushButton("Start animation");
+    servo1animationButton->setFixedWidth(150);
+    gridLayout->addWidget(servo1animationButton,4,3);
+
+    QPushButton *servo1poweOffButton = new QPushButton("Power OFF");
+    servo1poweOffButton->setFixedWidth(150);
+    gridLayout->addWidget(servo1poweOffButton,5,3);
+
+
+    QPushButton *servo2animationButton = new QPushButton("Start animation");
+    servo2animationButton->setFixedWidth(150);
+    gridLayout->addWidget(servo2animationButton,4,4);
+
+    QPushButton *servo2poweOffButton = new QPushButton("Power OFF");
+    servo2poweOffButton->setFixedWidth(150);
+    gridLayout->addWidget(servo2poweOffButton,5,4);
+
+    animationServo0 = new QPropertyAnimation(servo0Slider,"sliderPosition");
+    animationServo1 = new QPropertyAnimation(servo1Slider,"sliderPosition");
+    animationServo2 = new QPropertyAnimation(servo2Slider,"sliderPosition");
 
 
     // Terminal
@@ -155,12 +241,10 @@ MainWindow::MainWindow(QWidget *parent) :
     QPushButton *connectServerButton = new QPushButton("Connect Server");
     connectServerButton->setFixedWidth(150);
     gridUnderTerminalLayout->addWidget(connectServerButton,0,1);
-    connect(connectServerButton,SIGNAL(clicked()),this,SLOT(connectServerClicked()));
 
     QPushButton *disconnectServerButton = new QPushButton("Disconnect Server");
     disconnectServerButton->setFixedWidth(150);
     gridUnderTerminalLayout->addWidget(disconnectServerButton,0,2);
-    connect(disconnectServerButton,SIGNAL(clicked()),this,SIGNAL(disconnectServer()));
 
     hostLineEdit = new QLineEdit();
     hostLineEdit->setFixedWidth(120);
@@ -171,6 +255,35 @@ MainWindow::MainWindow(QWidget *parent) :
     portLineEdit->setFixedWidth(60);
     gridUnderTerminalLayout->addWidget(portLineEdit,0,4);
     portLineEdit->setText("2222");
+
+
+
+    connect(connectGumbaButton,SIGNAL(clicked()),this,SLOT(connectGumbaClicked()));
+    connect(disconnectGumbaButton,SIGNAL(clicked()),this,SLOT(disconnectGumbaClicked()));
+    connect(startGumbaApplicationButton,SIGNAL(clicked()),this,SLOT(startGumbaApplicationClicked()));
+    connect(toggleRTSButton,SIGNAL(clicked()),this,SLOT(toggleRTSClicked()));
+    connect(velocitySlider,SIGNAL(sliderMoved(int)),this,SLOT(velocitySliderChanged(int)));
+    connect(initServo,SIGNAL(clicked()),this,SLOT(initServoClicked()));
+
+
+    connect(servo0Slider,SIGNAL(valueChanged(int)),this,SLOT(servo0SliderChanged(int)));
+    //connect(servo0Slider,SIGNAL(valueChanged(int)),this,SLOT(servo0SliderChanged(int)));
+    connect(servo1Slider,SIGNAL(valueChanged(int)),this,SLOT(servo1SliderChanged(int)));
+    //connect(servo1Slider,SIGNAL(valueChanged(int)),this,SLOT(servo1SliderChanged(int)));
+    connect(servo2Slider,SIGNAL(valueChanged(int)),this,SLOT(servo2SliderChanged(int)));
+    //connect(servo2Slider,SIGNAL(valueChanged(int)),this,SLOT(servo2SliderChanged(int)));
+
+    connect(servo0animationButton,SIGNAL(clicked()),this,SLOT(servo0animationClicked()));
+    connect(servo0poweOffButton,SIGNAL(clicked()),this,SLOT(servo0PowerOffClicked()));
+    connect(servo1animationButton,SIGNAL(clicked()),this,SLOT(servo1animationClicked()));
+    connect(servo1poweOffButton,SIGNAL(clicked()),this,SLOT(servo1PowerOffClicked()));
+    connect(servo2animationButton,SIGNAL(clicked()),this,SLOT(servo2animationClicked()));
+    connect(servo2poweOffButton,SIGNAL(clicked()),this,SLOT(servo2PowerOffClicked()));
+    connect(servoAllPwmOff,SIGNAL(clicked()),this,SLOT(allSevosPwmOff()));
+
+    connect(connectServerButton,SIGNAL(clicked()),this,SLOT(connectServerClicked()));
+    connect(disconnectServerButton,SIGNAL(clicked()),this,SIGNAL(disconnectServer()));
+
 
 }
 
@@ -199,6 +312,31 @@ void MainWindow::keyPressEvent( QKeyEvent *event){
         break;
     }
 }
+
+int MainWindow::convertPwmToDegreeBig(int pwm)
+{
+    // up-limit     = 249 ms = +90
+    // down-limit   = 57  ms = -90
+    return (180*(pwm-downLimitBig)/(upLimitBig-downLimitBig))-90;
+}
+
+int MainWindow::convertPwmToDegreeSmall(int pwm)
+{
+    // up-limit     = 249 ms = +90
+    // down-limit   = 57  ms = -90
+    return (180*(pwm-downLimitSmall)/(upLimitSmall-downLimitSmall))-90;
+}
+
+int MainWindow::convertDegreeToPwmBig(int degree)
+{
+    return ((degree-90)*(upLimitBig-downLimitBig)-(180*downLimitBig))/180;
+}
+
+int MainWindow::convertDegreeToPwmSmall(int degree)
+{
+    return ((degree-90)*(upLimitSmall-downLimitSmall)-(180*downLimitSmall))/180;
+}
+
 
 void MainWindow::connectServerClicked(){
     emit connectServer(hostLineEdit->text(),portLineEdit->text());
@@ -235,24 +373,135 @@ void MainWindow::velocitySliderChanged(int pos)
     case 1:
         emit sendCommand("RoboterSpeed","1");
         writeToTerminal("> speedlevel: 1");
-        //ui->speedLable->setText("v = low");
+        velocityLabel->setText("v = low");
         break;
     case 2:
         emit sendCommand("RoboterSpeed","2");
         writeToTerminal("> speedlevel: 2");
-        //ui->speedLable->setText("v = med");
+        velocityLabel->setText("v = med");
         break;
     case 3:
         emit sendCommand("RoboterSpeed","3");
         writeToTerminal("> speedlevel: 3");
-        //ui->speedLable->setText("v = high");
+        velocityLabel->setText("v = high");
         break;
     case 4:
         emit sendCommand("RoboterSpeed","4");
         writeToTerminal("> speedlevel: MAX");
-        //ui->speedLable->setText("v = max");
+        velocityLabel->setText("v = max");
         break;
     }
+}
+
+void MainWindow::servo0SliderChanged(const int &pos)
+{
+    servo0Label->setText("S0 = " + QString::number(convertPwmToDegreeSmall(pos)));
+    //if(pos%2==0){
+    emit sendCommand("Servo0",QString::number(pos));
+    //}
+}
+
+void MainWindow::servo0animationClicked()
+{
+    moveServo(0,upLimitSmall,downLimitSmall,periodMove);
+    moveServo(1,upLimitBig,downLimitBig,periodMove);
+    moveServo(2,upLimitBig,downLimitBig,periodMove);
+
+}
+
+void MainWindow::servo0PowerOffClicked()
+{
+    servo0Label->setText("S0 = OFF");
+    emit sendCommand("Servo0",QString::number(0));
+}
+
+void MainWindow::servo1SliderChanged(const int &pos)
+{
+    servo1Label->setText("S1 = " + QString::number(convertPwmToDegreeBig(pos)));
+    //if(pos%2==0){
+    emit sendCommand("Servo1",QString::number(pos));
+    //}
+}
+
+void MainWindow::servo1animationClicked()
+{
+    moveServo(1,downLimitBig,upLimitBig,periodMove);
+}
+
+void MainWindow::servo1PowerOffClicked()
+{
+    servo1Label->setText("S1 = OFF");
+    emit sendCommand("Servo1",QString::number(0));
+}
+
+void MainWindow::servo2SliderChanged(const int &pos)
+{
+    servo2Label->setText("S2 = " + QString::number(convertPwmToDegreeBig(pos)));
+    //if(pos%2==0){
+        emit sendCommand("Servo2",QString::number(pos));
+    //}
+}
+
+void MainWindow::servo2animationClicked()
+{
+    moveServo(2,downLimitBig,upLimitBig,periodMove);
+}
+
+void MainWindow::servo2PowerOffClicked()
+{
+    servo2Label->setText("S2 = OFF");
+    emit sendCommand("Servo2",QString::number(0));
+}
+
+void MainWindow::allSevosPwmOff()
+{
+    animationServo0->stop();
+    animationServo1->stop();
+    animationServo2->stop();
+
+    servo0PowerOffClicked();
+    servo1PowerOffClicked();
+    servo2PowerOffClicked();
+    qDebug() << "all movements stopped, als pwm's resetted!!";
+    emit writeToTerminal("all movements stopped, als pwm's resetted!!");
+}
+
+void MainWindow::moveServo(const int &servoNumber, const int &start, const int &end, const int &period)
+{
+    //OutBounce
+    //InOutExpo
+    //InOutCubic
+    //InOutQuint
+
+    switch(servoNumber){
+    case 0:
+        animationServo0->setDuration(period);
+        animationServo0->setStartValue(start);
+        animationServo0->setEndValue(end);
+        animationServo0->setEasingCurve(QEasingCurve::InOutQuint);
+        animationServo0->start();
+        break;
+    case 1:
+        animationServo1->setDuration(period);
+        animationServo1->setStartValue(start);
+        animationServo1->setEndValue(end);
+        animationServo1->setEasingCurve(QEasingCurve::InOutQuint);
+        animationServo1->start();
+        break;
+    case 2:
+        animationServo2->setDuration(period);
+        animationServo2->setStartValue(start);
+        animationServo2->setEndValue(end);
+        animationServo2->setEasingCurve(QEasingCurve::InOutQuint);
+        animationServo2->start();
+        break;
+    }
+}
+
+
+void MainWindow::initServoClicked()
+{
+    emit sendCommand("Servo","init");
 }
 
 void MainWindow::writeToTerminal(const QString &terminalString){

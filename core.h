@@ -5,7 +5,7 @@
 
 #include "mainwindow.h"
 #include "tcpclient.h"
-#include "wiimote.h"
+#include "qwiimote.h"
 
 class Core : public QObject
 {
@@ -16,7 +16,7 @@ public:
 private:
     MainWindow *m_mainwindow;
     TcpClient * m_client;
-    WiiMote *m_wiimote;
+    QWiiMote *m_wiimote;
 signals:
     
 private slots:

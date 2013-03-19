@@ -6,6 +6,7 @@
 #include <QLineEdit>
 #include <QLabel>
 #include <QSlider>
+#include <QPropertyAnimation>
 
 namespace Ui {
 class MainWindow;
@@ -20,8 +21,29 @@ public:
     void keyPressEvent(QKeyEvent *event);
 
 private:
+    int convertPwmToDegreeBig(int pwm);
+    int convertPwmToDegreeSmall(int pwm);
+
+    int convertDegreeToPwmBig(int degree);
+    int convertDegreeToPwmSmall(int degree);
+
+    QPropertyAnimation *animationServo0;
+    QPropertyAnimation *animationServo1;
+    QPropertyAnimation *animationServo2;
+
     QTextEdit *terminalView;
     QSlider *velocitySlider;
+    QLabel *velocityLabel;
+
+    QSlider *servo0Slider;
+    QLabel *servo0Label;
+
+    QSlider *servo1Slider;
+    QLabel *servo1Label;
+
+    QSlider *servo2Slider;
+    QLabel *servo2Label;
+
 
     QLineEdit *hostLineEdit;
     QLineEdit *portLineEdit;
@@ -48,6 +70,22 @@ private slots:
     void startGumbaApplicationClicked();
     void toggleRTSClicked();
     void velocitySliderChanged(int pos);
+
+    void servo0SliderChanged(const int &pos);
+    void servo0animationClicked();
+    void servo0PowerOffClicked();
+    void servo1SliderChanged(const int &pos);
+    void servo1animationClicked();
+    void servo1PowerOffClicked();
+    void servo2SliderChanged(const int &pos);
+    void servo2animationClicked();
+    void servo2PowerOffClicked();
+
+    void allSevosPwmOff();
+
+    void moveServo(const int &servoNumber, const int &start, const int &end, const int &period);
+
+    void initServoClicked();
 
 signals:
     void connectServer(const QString &ipAddress, const QString &port);
