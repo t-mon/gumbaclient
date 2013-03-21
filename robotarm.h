@@ -9,7 +9,11 @@ class RobotArm : public QObject
 public:
     explicit RobotArm(QObject *parent = 0);
     
+private:
+    void homePosition();
+
 signals:
+    void moveServo();
     
 public slots:
     

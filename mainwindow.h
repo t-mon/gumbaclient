@@ -7,6 +7,7 @@
 #include <QLabel>
 #include <QSlider>
 #include <QPropertyAnimation>
+#include <QGroupBox>
 
 namespace Ui {
 class MainWindow;
@@ -21,6 +22,13 @@ public:
     void keyPressEvent(QKeyEvent *event);
 
 private:
+
+    QGroupBox *createGumbaConnectionGroupBox();
+    QGroupBox *createGumbaSensorDataGroupBox();
+    QGroupBox *createGumbaServerConnectionGroupBox();
+    QGroupBox *createServoControllGroupBox();
+    QGroupBox *createTerminalGroupBox();
+
     int convertPwmToDegreeBig(int pwm);
     int convertPwmToDegreeSmall(int pwm);
 
@@ -44,7 +52,6 @@ private:
     QSlider *servo2Slider;
     QLabel *servo2Label;
 
-
     QLineEdit *hostLineEdit;
     QLineEdit *portLineEdit;
     QLabel *connectionStatusLabel;
@@ -62,13 +69,13 @@ private:
 
     QLabel *batteryLabel;
 
-
 private slots:
     void connectServerClicked();
     void connectGumbaClicked();
     void disconnectGumbaClicked();
     void startGumbaApplicationClicked();
     void toggleRTSClicked();
+
     void velocitySliderChanged(int pos);
 
     void servo0SliderChanged(const int &pos);
@@ -80,10 +87,6 @@ private slots:
     void servo2SliderChanged(const int &pos);
     void servo2animationClicked();
     void servo2PowerOffClicked();
-
-    void allSevosPwmOff();
-
-    void moveServo(const int &servoNumber, const int &start, const int &end, const int &period);
 
     void initServoClicked();
 
@@ -106,6 +109,9 @@ public slots:
     void lightLeft(int lightIntensity);
     void lightRight(int lightIntensity);
     void batteryStatus(double battery);
+
+    void moveServo(const int &servoNumber, const int &start, const int &end, const int &period);
+    void allSevosPwmOff();
 
 };
 

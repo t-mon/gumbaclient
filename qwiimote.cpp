@@ -3,6 +3,7 @@
 #include <QDebug>
 
 
+
 QWiiMote::QWiiMote(QObject *parent) :
     QObject(parent)
 {
