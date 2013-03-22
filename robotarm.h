@@ -14,6 +14,7 @@ private:
 
 signals:
     void moveServo();
+
     
 public slots:
     

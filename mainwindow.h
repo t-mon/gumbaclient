@@ -22,12 +22,13 @@ public:
     void keyPressEvent(QKeyEvent *event);
 
 private:
-
     QGroupBox *createGumbaConnectionGroupBox();
     QGroupBox *createGumbaSensorDataGroupBox();
     QGroupBox *createGumbaServerConnectionGroupBox();
     QGroupBox *createServoControllGroupBox();
     QGroupBox *createTerminalGroupBox();
+    QGroupBox *createWiiMoteGroupBox();
+
 
     int convertPwmToDegreeBig(int pwm);
     int convertPwmToDegreeSmall(int pwm);
@@ -60,14 +61,21 @@ private:
     QLabel *bumperRightLabel;
     QLabel *obstacleLeftLabel;
     QLabel *obstacleRightLabel;
-
     QLabel *motorLeftLabel;
     QLabel *motorRightLabel;
-
     QLabel *lightLeftLabel;
     QLabel *lightRightLabel;
 
     QLabel *batteryLabel;
+
+    QLabel *wiiMoteRoll;
+    QLabel *wiiMotePitch;
+    QLabel *wiiMoteYaw;
+
+    QLabel *nunchukAngle;
+    QLabel *nunchukMagnitude;
+
+    bool m_wiiMoteABstate;
 
 private slots:
     void connectServerClicked();
@@ -90,9 +98,15 @@ private slots:
 
     void initServoClicked();
 
+    void updateWiiMoteOrientation(const float &roll, const float &pitch, const float &yaw);
+    void updateNunchuckJoyStickData(const float &angle, const float &magnitude);
+
 signals:
     void connectServer(const QString &ipAddress, const QString &port);
     void sendCommand(QString,QString);
+
+    void startWiiMote();
+    void stopWiiMote();
 
     void disconnectServer();
 
@@ -109,6 +123,8 @@ public slots:
     void lightLeft(int lightIntensity);
     void lightRight(int lightIntensity);
     void batteryStatus(double battery);
+
+    void wiiMoteABChanged(const bool &pressedState);
 
     void moveServo(const int &servoNumber, const int &start, const int &end, const int &period);
     void allSevosPwmOff();

@@ -2,7 +2,7 @@
 #define CORE_H
 
 #include <QObject>
-
+#include <QThread>
 #include "mainwindow.h"
 #include "tcpclient.h"
 #include "qwiimote.h"
@@ -17,10 +17,13 @@ private:
     MainWindow *m_mainwindow;
     TcpClient * m_client;
     QWiiMote *m_wiimote;
+    QThread *m_wiiMoteThread;
+
+
 signals:
     
 private slots:
-
+    void stopWiiProcess();
     
 };
 

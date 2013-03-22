@@ -22,6 +22,8 @@
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent)
 {
+    m_wiiMoteABstate = false;
+
     QWidget *centralWidget = new QWidget();
     setCentralWidget(centralWidget);
 
@@ -36,7 +38,7 @@ MainWindow::MainWindow(QWidget *parent) :
     mainGridLayout->addWidget(createGumbaSensorDataGroupBox(),0,2);
     mainGridLayout->addWidget(createTerminalGroupBox(),1,0,1,2,Qt::AlignCenter);
     mainGridLayout->addWidget(createServoControllGroupBox(),1,2);
-
+    mainGridLayout->addWidget(createWiiMoteGroupBox(),2,2);
 
 }
 
@@ -96,73 +98,74 @@ QGroupBox *MainWindow::createGumbaConnectionGroupBox()
 
 QGroupBox *MainWindow::createGumbaSensorDataGroupBox()
 {
-   QGroupBox* gumbaSensorDataGroupBox = new QGroupBox(tr("Gumba sensor Data"),this);
-   QGridLayout *gumbaSensorDataGrid = new QGridLayout;
+    QGroupBox* gumbaSensorDataGroupBox = new QGroupBox(tr("Gumba sensor Data"),this);
+    QGridLayout *gumbaSensorDataGrid = new QGridLayout;
 
-   // Sensor status
-   bumperLeftLabel = new QLabel(this);
-   bumperLeftLabel->setAlignment(Qt::AlignCenter);
-   bumperLeftLabel->setText("Bumper L");
-   bumperLeftLabel->setStyleSheet("background-color:gray; border-radius: 5px;");
+    // Sensor status
+    bumperLeftLabel = new QLabel(this);
+    bumperLeftLabel->setAlignment(Qt::AlignCenter);
+    bumperLeftLabel->setText("Bumper L");
+    bumperLeftLabel->setStyleSheet("background-color:gray; border-radius: 5px;");
 
-   bumperRightLabel = new QLabel(this);
-   bumperRightLabel->setAlignment(Qt::AlignCenter);
-   bumperRightLabel->setText("Bumper R");
-   bumperRightLabel->setStyleSheet("background-color:gray; border-radius: 5px;");
+    bumperRightLabel = new QLabel(this);
+    bumperRightLabel->setAlignment(Qt::AlignCenter);
+    bumperRightLabel->setText("Bumper R");
+    bumperRightLabel->setStyleSheet("background-color:gray; border-radius: 5px;");
 
-   obstacleLeftLabel = new QLabel(this);
-   obstacleLeftLabel->setAlignment(Qt::AlignCenter);
-   obstacleLeftLabel->setText("Obstacle L");
-   obstacleLeftLabel->setStyleSheet("background-color:gray; border-radius: 5px;");
+    obstacleLeftLabel = new QLabel(this);
+    obstacleLeftLabel->setAlignment(Qt::AlignCenter);
+    obstacleLeftLabel->setText("Obstacle L");
+    obstacleLeftLabel->setStyleSheet("background-color:gray; border-radius: 5px;");
 
-   obstacleRightLabel = new QLabel(this);
-   obstacleRightLabel->setAlignment(Qt::AlignCenter);
-   obstacleRightLabel->setText("Obstacle R");
-   obstacleRightLabel->setStyleSheet("background-color:gray; border-radius: 5px;");
+    obstacleRightLabel = new QLabel(this);
+    obstacleRightLabel->setAlignment(Qt::AlignCenter);
+    obstacleRightLabel->setText("Obstacle R");
+    obstacleRightLabel->setStyleSheet("background-color:gray; border-radius: 5px;");
 
-   motorLeftLabel = new QLabel(this);
-   motorLeftLabel->setText("Motor L: 0");
+    motorLeftLabel = new QLabel(this);
+    motorLeftLabel->setText("Motor L: 0");
 
-   motorRightLabel = new QLabel(this);
-   motorRightLabel->setText("Motor R: 0");
+    motorRightLabel = new QLabel(this);
+    motorRightLabel->setText("Motor R: 0");
 
-   lightLeftLabel = new QLabel(this);
-   lightLeftLabel->setText("Light L: 0");
+    lightLeftLabel = new QLabel(this);
+    lightLeftLabel->setText("Light L: 0");
 
-   lightRightLabel = new QLabel(this);
-   lightRightLabel->setText("Light R: 0");
+    lightRightLabel = new QLabel(this);
+    lightRightLabel->setText("Light R: 0");
 
-   batteryLabel = new QLabel(this);
-   batteryLabel->setText("0 V");
-   batteryLabel->setAlignment(Qt::AlignCenter);
-   batteryLabel->setStyleSheet("background-color:gray; border-radius: 5px;");
+    batteryLabel = new QLabel(this);
+    batteryLabel->setText("0 V");
+    batteryLabel->setAlignment(Qt::AlignCenter);
+    batteryLabel->setStyleSheet("background-color:gray; border-radius: 5px;");
 
-   velocitySlider = new QSlider(Qt::Horizontal, this);
-   velocitySlider->setTickInterval(1);
-   velocitySlider->setMinimum(1);
-   velocitySlider->setMaximum(4);
+    velocitySlider = new QSlider(Qt::Horizontal, this);
+    velocitySlider->setTickInterval(1);
+    velocitySlider->setFixedWidth(150);
+    velocitySlider->setMinimum(1);
+    velocitySlider->setMaximum(4);
 
-   velocityLabel = new QLabel(this);
-   velocityLabel->setAlignment(Qt::AlignCenter);
-   velocityLabel->setText("v=0");
+    velocityLabel = new QLabel(this);
+    velocityLabel->setAlignment(Qt::AlignCenter);
+    velocityLabel->setText("v=0");
 
-   gumbaSensorDataGrid->addWidget(bumperLeftLabel,0,0);
-   gumbaSensorDataGrid->addWidget(bumperRightLabel,0,1);
-   gumbaSensorDataGrid->addWidget(obstacleLeftLabel,1,0);
-   gumbaSensorDataGrid->addWidget(obstacleRightLabel,1,1);
-   gumbaSensorDataGrid->addWidget(motorLeftLabel,2,0);
-   gumbaSensorDataGrid->addWidget(motorRightLabel,2,1);
-   gumbaSensorDataGrid->addWidget(lightLeftLabel,3,0);
-   gumbaSensorDataGrid->addWidget(lightRightLabel,3,1);
-   gumbaSensorDataGrid->addWidget(batteryLabel,4,0);
-//   gumbaSensorDataGrid->addWidget(velocitySlider,5,0);
-//   gumbaSensorDataGrid->addWidget(velocityLabel,5,1);
+    gumbaSensorDataGrid->addWidget(bumperLeftLabel,0,0);
+    gumbaSensorDataGrid->addWidget(bumperRightLabel,0,1);
+    gumbaSensorDataGrid->addWidget(obstacleLeftLabel,1,0);
+    gumbaSensorDataGrid->addWidget(obstacleRightLabel,1,1);
+    gumbaSensorDataGrid->addWidget(motorLeftLabel,2,0);
+    gumbaSensorDataGrid->addWidget(motorRightLabel,2,1);
+    gumbaSensorDataGrid->addWidget(lightLeftLabel,3,0);
+    gumbaSensorDataGrid->addWidget(lightRightLabel,3,1);
+    gumbaSensorDataGrid->addWidget(batteryLabel,4,0);
+    gumbaSensorDataGrid->addWidget(velocitySlider,5,0);
+    gumbaSensorDataGrid->addWidget(velocityLabel,5,1);
 
-   gumbaSensorDataGroupBox->setLayout(gumbaSensorDataGrid);
+    gumbaSensorDataGroupBox->setLayout(gumbaSensorDataGrid);
 
-   connect(velocitySlider,SIGNAL(sliderMoved(int)),this,SLOT(velocitySliderChanged(int)));
+    connect(velocitySlider,SIGNAL(sliderMoved(int)),this,SLOT(velocitySliderChanged(int)));
 
-   return gumbaSensorDataGroupBox;
+    return gumbaSensorDataGroupBox;
 }
 
 QGroupBox *MainWindow::createGumbaServerConnectionGroupBox()
@@ -226,21 +229,22 @@ QGroupBox *MainWindow::createServoControllGroupBox()
     //      6              24             P1-18
     //      7              25             P1-22
 
-    // =====================================================Servo 0
+    // ===================================================== Servo 0
     servo0Slider = new QSlider(Qt::Horizontal, this);
-    servo0Slider->setMinimumWidth(100);
+    servo0Slider->setFixedWidth(100);
     servo0Slider->setTickInterval(1);
     servo0Slider->setMinimum(downLimitSmall);
     servo0Slider->setMaximum(upLimitSmall);
     servo0Slider->setValue(downLimitSmall);
 
     servo0Label = new QLabel(this);
+    servo0Label->setFixedWidth(60);
     servo0Label->setAlignment(Qt::AlignCenter);
     servo0Label->setText("S0 = ");
 
-    // =====================================================Servo 1
+    // ===================================================== Servo 1
     servo1Slider = new QSlider(Qt::Horizontal, this);
-    servo1Slider->setMinimumWidth(100);
+    servo1Slider->setFixedWidth(100);
     servo1Slider->setTickInterval(1);
     servo1Slider->setMinimum(downLimitBig);
     servo1Slider->setMaximum(upLimitBig);
@@ -250,9 +254,9 @@ QGroupBox *MainWindow::createServoControllGroupBox()
     servo1Label->setAlignment(Qt::AlignCenter);
     servo1Label->setText("S1 = ");
 
-    // =====================================================Servo 2
+    // ===================================================== Servo 2
     servo2Slider = new QSlider(Qt::Horizontal, this);
-    servo2Slider->setMinimumWidth(100);
+    servo2Slider->setFixedWidth(100);
     servo2Slider->setTickInterval(1);
     servo2Slider->setMinimum(downLimitBig);
     servo2Slider->setMaximum(upLimitBig);
@@ -319,6 +323,54 @@ QGroupBox *MainWindow::createTerminalGroupBox()
     return terminalGroupBox;
 }
 
+QGroupBox *MainWindow::createWiiMoteGroupBox()
+{
+    QGroupBox *wiiMoteGroupBox = new QGroupBox(tr("Wii"),this);
+    QGridLayout *wiiMoteGrid = new QGridLayout;
+
+    QPushButton *startWiiMoteButton = new QPushButton("Start WiiMote");
+    QPushButton *disconnectWiiMoteButton = new QPushButton("Disconnct WiiMote");
+    wiiMoteRoll = new QLabel(this);
+    wiiMoteRoll->setFixedWidth(140);
+    wiiMoteRoll->setAlignment(Qt::AlignLeft);
+    wiiMoteRoll->setText("R: 0");
+
+    wiiMotePitch = new QLabel(this);
+    wiiMotePitch->setFixedWidth(140);
+    wiiMotePitch->setAlignment(Qt::AlignLeft);
+    wiiMotePitch->setText("P: 0");
+
+    wiiMoteYaw = new QLabel(this);
+    wiiMoteYaw->setFixedWidth(140);
+    wiiMoteYaw->setAlignment(Qt::AlignLeft);
+    wiiMoteYaw->setText("Y: 0");
+
+    nunchukAngle = new QLabel(this);
+    nunchukAngle->setFixedWidth(140);
+    nunchukAngle->setAlignment(Qt::AlignLeft);
+    nunchukAngle->setText("Ang: 0");
+
+    nunchukMagnitude = new QLabel(this);
+    nunchukMagnitude->setFixedWidth(140);
+    nunchukMagnitude->setAlignment(Qt::AlignLeft);
+    nunchukMagnitude->setText("Mag: 0");
+
+    wiiMoteGrid->addWidget(startWiiMoteButton,0,0);
+    wiiMoteGrid->addWidget(disconnectWiiMoteButton,1,0);
+    wiiMoteGrid->addWidget(wiiMoteRoll,0,1);
+    wiiMoteGrid->addWidget(wiiMotePitch,1,1);
+    wiiMoteGrid->addWidget(wiiMoteYaw,2,1);
+    wiiMoteGrid->addWidget(nunchukAngle,0,2);
+    wiiMoteGrid->addWidget(nunchukMagnitude,1,2);
+
+    connect(startWiiMoteButton,SIGNAL(clicked()),this,SIGNAL(startWiiMote()))   ;
+    connect(disconnectWiiMoteButton,SIGNAL(clicked()),this,SIGNAL(stopWiiMote()));
+
+    wiiMoteGroupBox->setLayout(wiiMoteGrid);
+
+    return wiiMoteGroupBox;
+}
+
 int MainWindow::convertPwmToDegreeBig(int pwm)
 {
     // up-limit     = 249 ms = +90
@@ -357,7 +409,7 @@ void MainWindow::connectGumbaClicked()
 void MainWindow::disconnectGumbaClicked()
 {
     emit sendCommand("RoboterApplication","disconnect");
-    writeToTerminal("Disconnect gumba from server");
+    writeToTerminal("Disconnect gumba from server...");
 }
 
 void MainWindow::startGumbaApplicationClicked()
@@ -378,22 +430,22 @@ void MainWindow::velocitySliderChanged(int pos)
 
     case 1:
         emit sendCommand("RoboterSpeed","1");
-        writeToTerminal("> speedlevel: 1");
+        writeToTerminal("speedlevel: 1");
         velocityLabel->setText("v = low");
         break;
     case 2:
         emit sendCommand("RoboterSpeed","2");
-        writeToTerminal("> speedlevel: 2");
+        writeToTerminal("speedlevel: 2");
         velocityLabel->setText("v = med");
         break;
     case 3:
         emit sendCommand("RoboterSpeed","3");
-        writeToTerminal("> speedlevel: 3");
+        writeToTerminal("speedlevel: 3");
         velocityLabel->setText("v = high");
         break;
     case 4:
         emit sendCommand("RoboterSpeed","4");
-        writeToTerminal("> speedlevel: MAX");
+        writeToTerminal("speedlevel: MAX");
         velocityLabel->setText("v = max");
         break;
     }
@@ -464,7 +516,6 @@ void MainWindow::allSevosPwmOff()
     servo0PowerOffClicked();
     servo1PowerOffClicked();
     servo2PowerOffClicked();
-    qDebug() << "all movements stopped, als pwm's resetted!!";
     emit writeToTerminal("all movements stopped, als pwm's resetted!!");
 }
 
@@ -506,7 +557,33 @@ void MainWindow::initServoClicked()
     emit sendCommand("Servo","init");
 }
 
+void MainWindow::updateWiiMoteOrientation(const float &roll, const float &pitch, const float &yaw)
+{
+    int roll_i, pitch_i, yaw_i;
+    roll_i = roll;
+    pitch_i = pitch;
+    yaw_i = yaw;
+    wiiMoteRoll->setText("R: " + QString::number(roll_i));
+    wiiMotePitch->setText("P: " + QString::number(pitch_i));
+    wiiMoteYaw->setText("Y: " + QString::number(yaw_i));
+
+    if(m_wiiMoteABstate){
+        servo2Slider->setValue(pitch_i*(-1)+50);
+        //servo1Slider->setValue(roll_i*(-1)+100);
+    }
+
+
+}
+
+void MainWindow::updateNunchuckJoyStickData(const float &angle, const float &magnitude)
+{
+    nunchukAngle->setText("Ang: " + QString::number(angle));
+    nunchukMagnitude->setText("Mag: " + QString::number(magnitude));
+}
+
+
 void MainWindow::writeToTerminal(const QString &terminalString){
+    qDebug() << terminalString;
     terminalView->append(" " + terminalString);
 }
 
@@ -583,6 +660,11 @@ void MainWindow::lightRight(int lightIntensity)
 void MainWindow::batteryStatus(double battery)
 {
     batteryLabel->setText(QString::number(battery)+" V");
+}
+
+void MainWindow::wiiMoteABChanged(const bool &pressedState)
+{
+    m_wiiMoteABstate = pressedState;
 }
 
 

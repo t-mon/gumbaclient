@@ -9,9 +9,14 @@ QT       += core gui network
 TARGET = gumbaclient
 TEMPLATE = app
 
-LIBS += -lqjson
-#-L/usr/local/lib/*wii
-#INCLUDEPATH += /usr/local/include/wiic/
+LIBS += -lqjson -L/home/timon/development/wiic/build/wiicpp/ -lwiicpp
+
+INCLUDEPATH +=  /home/timon/development/wiic/src/wiicpp/ \
+                /home/timon/development/wiic/src/wiic/ \
+                /home/timon/development/wiic/src/log/ \
+                /home/timon/development/wiic/src/ml/
+
+
 
 SOURCES += main.cpp\
     mainwindow.cpp \

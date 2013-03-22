@@ -6,7 +6,9 @@ Core::Core(QObject *parent) :
     m_mainwindow = new MainWindow();
     m_mainwindow->show();
 
-    m_wiimote = new QWiiMote(this);
+    m_wiiMoteThread = new QThread(this);
+    m_wiimote = new QWiiMote();
+    m_wiimote->moveToThread(m_wiiMoteThread);
 
     m_client = new TcpClient(this);
 
@@ -29,4 +31,29 @@ Core::Core(QObject *parent) :
 
     connect(m_client,SIGNAL(batteryVoltage(double)),m_mainwindow,SLOT(batteryStatus(double)));
 
+    connect(m_wiiMoteThread,SIGNAL(started()),m_wiimote,SLOT(startWiiMotesLoop()));
+    connect(m_mainwindow,SIGNAL(stopWiiMote()),this,SLOT(stopWiiProcess()));
+    connect(m_mainwindow,SIGNAL(startWiiMote()),m_wiiMoteThread,SLOT(start()));
+
+    connect(m_wiimote,SIGNAL(stopProcess()),m_wiiMoteThread,SLOT(quit()));
+    connect(m_wiimote,SIGNAL(writeToTerminal(QString)),m_mainwindow,SLOT(writeToTerminal(QString)));
+    connect(m_wiimote,SIGNAL(orientationWiiMoteChanged(float,float,float)),m_mainwindow,SLOT(updateWiiMoteOrientation(float,float,float)));
+    connect(m_wiimote,SIGNAL(nunchukJoystickChanged(float,float)),m_mainwindow,SLOT(updateNunchuckJoyStickData(float,float)));
+
+    connect(m_wiimote,SIGNAL(button_AB_pressed(bool)),m_mainwindow,SLOT(wiiMoteABChanged(bool)));
+
 }
+
+void Core::stopWiiProcess()
+{
+    if(m_wiiMoteThread->isRunning()){
+        qDebug() << "Wii process is running...";
+        m_wiiMoteThread->quit();
+        if(!m_wiiMoteThread->isRunning()){
+            qDebug() << "Wii process stopped...";
+        }
+    }else{
+        qDebug() << "Wii process is not running...";
+    }
+}
+

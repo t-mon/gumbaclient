@@ -25,28 +25,24 @@ TcpClient::TcpClient(QObject *parent) :
 
 void TcpClient::connectToHost(QString ipAddress, QString port){
 
-    qDebug() << "connecting to" << ipAddress << " over port " << port;
     emit writeToTerminal("connecting to " + ipAddress + " over port " + port);
     tcpSocket->connectToHost(QHostAddress(ipAddress), port.toInt());
 }
 
 void TcpClient::connectedToHost(){
 
-    qDebug() << "-->connected to server. OK";
     emit connectionStatusChanged(true);
     emit writeToTerminal("--->connected to server. OK");
 }
 
 void TcpClient::connectionError(QAbstractSocket::SocketError error)
 {
-    qDebug() << "connection error" << error;
     emit connectionStatusChanged(false);
-    emit writeToTerminal("---> connection error");
+    emit writeToTerminal("---> connection error" + error);
 }
 
 void TcpClient::disconnectFromHost(){
     tcpSocket->close();
-    qDebug() << "disconnected from server.";
     emit connectionStatusChanged(false);
     emit writeToTerminal("disconnected from server.");
 }
@@ -59,7 +55,7 @@ void TcpClient::sendData(QString target, QString command){
 
     QJson::Serializer serializer;
     QByteArray dataOut = serializer.serialize(map);
-    qDebug() << "-->Send Data: " << dataOut;
+    //qDebug() << "-->Send Data: " << dataOut;
     tcpSocket->write(dataOut+"\n");
     tcpSocket->flush();
 }
@@ -70,12 +66,12 @@ void TcpClient::readData(){
     m_tcpBuffer.append(tcpSocket->readAll());
     while(!m_tcpBuffer.isEmpty()){
         int newLinePositionPackage = m_tcpBuffer.indexOf('\n') + 1;
-        qDebug() << "----> data to parse: " << m_tcpBuffer.left(newLinePositionPackage);
+        //qDebug() << "----> data to parse: " << m_tcpBuffer.left(newLinePositionPackage);
 
         emit newLineToParse(m_tcpBuffer.left(newLinePositionPackage));
         m_tcpBuffer = m_tcpBuffer.right((m_tcpBuffer.length() - newLinePositionPackage));
     }
-    qDebug() << "----> got message: " << dataIn;
+    //qDebug() << "----> got message: " << dataIn;
 
 
 }
@@ -155,8 +151,6 @@ void TcpClient::readGumbaData(QString gumbaString)
         }
     }
     if(gumbaString.at(0) == '[' || gumbaString.at(0) == '#' ){
-
         emit writeToTerminal("          " + gumbaString);
-        qDebug() << "            " + gumbaString;
     }
 }
