@@ -279,12 +279,14 @@ void QWiiMote::startWiiMotesLoop()
 
     if (!wiimotes.size()) {
         emit writeToTerminal("no wii remote found!");
+        emit stopProcess();
         m_exit = true;
         return;
     }
 
     if(wiimotes.size() != 1){
         emit writeToTerminal("please add just one Wii Remote");
+        emit stopProcess();
         m_exit = true;
         return;
     }
@@ -327,16 +329,31 @@ void QWiiMote::startWiiMotesLoop()
 
             case CWiimote::EVENT_DISCONNECT:
                 emit writeToTerminal("Wii: Wii mote disconnected!");
+                m_exit=true;
+                emit stopProcess();
                 break;
 
             case CWiimote::EVENT_UNEXPECTED_DISCONNECT:
                 emit writeToTerminal("Wii: Wii mote disconnected!");
-                reloadWiimotes = 1;
+                m_exit=true;
+                emit stopProcess();
                 break;
 
             case CWiimote::EVENT_NUNCHUK_INSERTED:
                 emit writeToTerminal("Wii: Nunchuk inserted!");
-                //m_wiiMote->ExpansionDevice.Nunchuk.Joystick.SetCenterCal(0,0);
+                reloadWiimotes = 1;
+                break;
+
+            case CWiimote::EVENT_NUNCHUK_REMOVED:
+                emit writeToTerminal("Wii: Nunchuk removed!");
+                break;
+
+            case CWiimote::EVENT_MOTION_PLUS_INSERTED:
+                emit writeToTerminal("Wii: WiiMotionPlus inserted!");
+                break;
+
+            case CWiimote::EVENT_MOTION_PLUS_REMOVED:
+                emit writeToTerminal("Wii: WiiMotionPlus removed!");
                 reloadWiimotes = 1;
                 break;
 
@@ -345,37 +362,24 @@ void QWiiMote::startWiiMotesLoop()
                 reloadWiimotes = 1;
                 break;
 
+            case CWiimote::EVENT_CLASSIC_CTRL_REMOVED:
+                emit writeToTerminal("Wii: Classic Controller removed!");
+                break;
+
             case CWiimote::EVENT_GUITAR_HERO_3_CTRL_INSERTED:
                 emit writeToTerminal("Wii: Guitar Hero guitar inserted!");
                 reloadWiimotes = 1;
-                break;
-
-            case CWiimote::EVENT_MOTION_PLUS_INSERTED:
-                emit writeToTerminal("Wii: WiiMotionPlus inserted!");
-                break;
-
-            case CWiimote::EVENT_NUNCHUK_REMOVED:
-                emit writeToTerminal("Wii: Nunchuk removed!");
-                break;
-
-            case CWiimote::EVENT_CLASSIC_CTRL_REMOVED:
-                emit writeToTerminal("Wii: Classic Controller removed!");
                 break;
 
             case CWiimote::EVENT_GUITAR_HERO_3_CTRL_REMOVED:
                 emit writeToTerminal("Wii: Guitar Hero guitar removed!");
                 break;
 
-            case CWiimote::EVENT_MOTION_PLUS_REMOVED:
-                emit writeToTerminal("Wii: WiiMotionPlus removed!");
-                reloadWiimotes = 1;
-                break;
-
             default:
                 break;
             }
         }
-    }while(wiimotes.size() || m_exit); // Go so long as there are wiimotes left to poll
+    }while(wiimotes.size() || !m_exit); // Go so long as there are wiimotes left to poll
     qDebug() << "wii loop finished";
     emit stopProcess();
 
@@ -386,6 +390,7 @@ void QWiiMote::startWiiMotesLoop()
 void QWiiMote::disconnectWiiMote()
 {
     m_exit = true;
+    m_wiiMote->Disconnect();
     emit stopProcess();
     writeToTerminal("WiiMote disconnect");
 }

@@ -8,9 +8,11 @@
 #include <QKeyEvent>
 #include <QIcon>
 
-
-// up-limit     = 249 ms = +90
-// down-limit   = 57  ms = -90
+// PWM limits for servos (big servo, small sevo)
+// up-limit big     = 243 ms = +90
+// down-limit big   = 57  ms = -90
+// up-limit small   = 227 ms = +90
+// down-limit small = 50  ms = -90
 #define upLimitBig 243
 #define downLimitBig 57
 #define upLimitSmall 227

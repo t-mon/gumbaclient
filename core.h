@@ -17,14 +17,15 @@ public:
 private:
     MainWindow *m_mainwindow;
     TcpClient * m_client;
-    QWiiMote *m_wiimote;
     QThread *m_wiiMoteThread;
     RobotArm *m_arm;
 
 signals:
     
 private slots:
+    void startWiiProcess();
     void stopWiiProcess();
+    void wiiProcessFinished();
     
 };
 
