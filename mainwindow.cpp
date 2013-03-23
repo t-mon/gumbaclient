@@ -28,7 +28,7 @@ MainWindow::MainWindow(QWidget *parent) :
     setCentralWidget(centralWidget);
 
     setWindowTitle("Gumba Client");
-    setWindowIcon(QIcon("gumbaserver80.png"));
+    setWindowIcon(QIcon("gumbaclient80.png"));
 
     QGridLayout *mainGridLayout = new QGridLayout();
     centralWidget->setLayout(mainGridLayout);

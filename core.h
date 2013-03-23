@@ -6,6 +6,7 @@
 #include "mainwindow.h"
 #include "tcpclient.h"
 #include "qwiimote.h"
+#include "robotarm.h"
 
 class Core : public QObject
 {
@@ -18,7 +19,7 @@ private:
     TcpClient * m_client;
     QWiiMote *m_wiimote;
     QThread *m_wiiMoteThread;
-
+    RobotArm *m_arm;
 
 signals:
     

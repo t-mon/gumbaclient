@@ -266,6 +266,7 @@ void QWiiMote::HandleStatus()
 
 void QWiiMote::startWiiMotesLoop()
 {
+    m_exit = false;
     qDebug() << "Start wii loop";
     CWii wii;
     std::vector<CWiimote>::iterator i;
@@ -278,11 +279,13 @@ void QWiiMote::startWiiMotesLoop()
 
     if (!wiimotes.size()) {
         emit writeToTerminal("no wii remote found!");
+        m_exit = true;
         return;
     }
 
     if(wiimotes.size() != 1){
         emit writeToTerminal("please add just one Wii Remote");
+        m_exit = true;
         return;
     }
     emit writeToTerminal("...WiiMote connected!");
@@ -292,14 +295,13 @@ void QWiiMote::startWiiMotesLoop()
     m_wiiMote->SetMotionSensingMode(CWiimote::ON);
     m_wiiMote->SetSmoothing(true);
 
-    qDebug() << "====================================";
-    qDebug() << "Controller Status [wiimote " << m_wiiMote->GetID() << "]";
-    qDebug() << "   attachment: " << m_wiiMote->ExpansionDevice.GetType();
-    qDebug() << "   speaker: " << m_wiiMote->isUsingSpeaker();
-    qDebug() << "   ir: " << m_wiiMote->isUsingIR();
-    qDebug() << "   leds: " << m_wiiMote->isLEDSet(1) << m_wiiMote->isLEDSet(2) << m_wiiMote->isLEDSet(3) << m_wiiMote->isLEDSet(4);
-    qDebug() << "   battery: " << m_wiiMote->GetBatteryLevel();
-    qDebug();
+    emit writeToTerminal("====================================");
+    emit writeToTerminal("Controller Status [wiimote " +QString::number(m_wiiMote->GetID()) + "]");
+    emit writeToTerminal("   attachment: " + QString::number(m_wiiMote->ExpansionDevice.GetType()));
+    emit writeToTerminal("   speaker:    " + QString::number(m_wiiMote->isUsingSpeaker()));
+    emit writeToTerminal("   ir:         " + QString::number(m_wiiMote->isUsingIR()));
+    emit writeToTerminal("   leds:       " + QString::number(m_wiiMote->isLEDSet(1)) + " " + QString::number(m_wiiMote->isLEDSet(2)) + " " +  QString::number(m_wiiMote->isLEDSet(3)) + " " + QString::number(m_wiiMote->isLEDSet(4)));
+    emit writeToTerminal("   battery:    " + QString::number(m_wiiMote->GetBatteryLevel()) + "\n");
 
 
     do{
@@ -334,6 +336,7 @@ void QWiiMote::startWiiMotesLoop()
 
             case CWiimote::EVENT_NUNCHUK_INSERTED:
                 emit writeToTerminal("Wii: Nunchuk inserted!");
+                //m_wiiMote->ExpansionDevice.Nunchuk.Joystick.SetCenterCal(0,0);
                 reloadWiimotes = 1;
                 break;
 
@@ -374,6 +377,8 @@ void QWiiMote::startWiiMotesLoop()
         }
     }while(wiimotes.size() || m_exit); // Go so long as there are wiimotes left to poll
     qDebug() << "wii loop finished";
+    emit stopProcess();
+
 
 }
 
@@ -381,6 +386,7 @@ void QWiiMote::startWiiMotesLoop()
 void QWiiMote::disconnectWiiMote()
 {
     m_exit = true;
+    emit stopProcess();
     writeToTerminal("WiiMote disconnect");
 }
 
