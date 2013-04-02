@@ -72,8 +72,6 @@ void TcpClient::readData(){
         m_tcpBuffer = m_tcpBuffer.right((m_tcpBuffer.length() - newLinePositionPackage));
     }
     //qDebug() << "----> got message: " << dataIn;
-
-
 }
 
 void TcpClient::parseLine(const QString &line)

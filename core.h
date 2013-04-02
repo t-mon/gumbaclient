@@ -7,6 +7,7 @@
 #include "tcpclient.h"
 #include "qwiimote.h"
 #include "robotarm.h"
+#include "robotvisualisation.h"
 
 class Core : public QObject
 {

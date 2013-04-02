@@ -4,15 +4,14 @@
 #
 #-------------------------------------------------
 
-QT       += core gui network
+QT       += core gui network opengl
 
 TARGET = gumbaclient
 TEMPLATE = app
 
-LIBS += -lqjson -L/usr/local/lib/ -lwiicpp
+LIBS += -lqjson -L/usr/local/lib/ -lwiicpp -lGL -lGLU -lglut
 
 INCLUDEPATH += /usr/local/include/wiic/
-
 
 
 SOURCES += main.cpp\
@@ -20,11 +19,13 @@ SOURCES += main.cpp\
     core.cpp \
     tcpclient.cpp \
     qwiimote.cpp \
-    robotarm.cpp
+    robotarm.cpp \
+    robotvisualisation.cpp
 
 HEADERS  += mainwindow.h \
     core.h \
     tcpclient.h \
     qwiimote.h \
-    robotarm.h
+    robotarm.h \
+    robotvisualisation.h
 

@@ -9,6 +9,8 @@
 #include <QPropertyAnimation>
 #include <QGroupBox>
 
+#include "robotvisualisation.h"
+
 namespace Ui {
 class MainWindow;
 }
@@ -22,6 +24,8 @@ public:
     void keyPressEvent(QKeyEvent *event);
 
 private:
+    RobotVisualisation *m_visualisation;
+
     QGroupBox *createGumbaConnectionGroupBox();
     QGroupBox *createGumbaSensorDataGroupBox();
     QGroupBox *createGumbaServerConnectionGroupBox();
@@ -72,6 +76,10 @@ private:
     QLabel *wiiMotePitch;
     QLabel *wiiMoteYaw;
 
+    QLabel *nunchukRoll;
+    QLabel *nunchukPitch;
+    QLabel *nunchukYaw;
+
     QLabel *nunchukAngle;
     QLabel *nunchukMagnitude;
 
@@ -99,11 +107,15 @@ private slots:
     void initServoClicked();
 
     void updateWiiMoteOrientation(const float &roll, const float &pitch, const float &yaw);
+    void updateNunchuckOrientation(const float &roll, const float &pitch, const float &yaw);
     void updateNunchuckJoyStickData(const float &angle, const float &magnitude);
 
 signals:
     void connectServer(const QString &ipAddress, const QString &port);
     void sendCommand(QString,QString);
+
+    void angle1Changed();
+    void angle2Changed();
 
     void startWiiMote();
     void stopWiiMote();

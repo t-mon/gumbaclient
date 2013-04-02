@@ -29,6 +29,9 @@ MainWindow::MainWindow(QWidget *parent) :
     QWidget *centralWidget = new QWidget();
     setCentralWidget(centralWidget);
 
+    m_visualisation = new RobotVisualisation();
+    //setCentralWidget(m_visualisation);
+
     setWindowTitle("Gumba Client");
     setWindowIcon(QIcon("gumbaclient80.png"));
 
@@ -38,7 +41,8 @@ MainWindow::MainWindow(QWidget *parent) :
     mainGridLayout->addWidget(createGumbaServerConnectionGroupBox(),0,0);
     mainGridLayout->addWidget(createGumbaConnectionGroupBox(),0,1);
     mainGridLayout->addWidget(createGumbaSensorDataGroupBox(),0,2);
-    mainGridLayout->addWidget(createTerminalGroupBox(),1,0,1,2,Qt::AlignCenter);
+    mainGridLayout->addWidget(m_visualisation,1,0,2,2);
+    //mainGridLayout->addWidget(createTerminalGroupBox(),1,0,1,2,Qt::AlignCenter);
     mainGridLayout->addWidget(createServoControllGroupBox(),1,2);
     mainGridLayout->addWidget(createWiiMoteGroupBox(),2,2);
 
@@ -250,7 +254,7 @@ QGroupBox *MainWindow::createServoControllGroupBox()
     servo1Slider->setTickInterval(1);
     servo1Slider->setMinimum(downLimitBig);
     servo1Slider->setMaximum(upLimitBig);
-    servo1Slider->setValue(downLimitBig);
+    servo1Slider->setValue((downLimitBig+upLimitBig)/2);
 
     servo1Label = new QLabel(this);
     servo1Label->setAlignment(Qt::AlignCenter);
@@ -262,7 +266,7 @@ QGroupBox *MainWindow::createServoControllGroupBox()
     servo2Slider->setTickInterval(1);
     servo2Slider->setMinimum(downLimitBig);
     servo2Slider->setMaximum(upLimitBig);
-    servo2Slider->setValue(downLimitBig);
+    servo2Slider->setValue((downLimitBig+upLimitBig)/2);
 
     servo2Label = new QLabel(this);
     servo2Label->setAlignment(Qt::AlignCenter);
@@ -347,6 +351,22 @@ QGroupBox *MainWindow::createWiiMoteGroupBox()
     wiiMoteYaw->setAlignment(Qt::AlignLeft);
     wiiMoteYaw->setText("Y: 0");
 
+    nunchukRoll = new QLabel(this);
+    nunchukRoll->setFixedWidth(140);
+    nunchukRoll->setAlignment(Qt::AlignLeft);
+    nunchukRoll->setText("R: 0");
+
+    nunchukPitch = new QLabel(this);
+    nunchukPitch->setFixedWidth(140);
+    nunchukPitch->setAlignment(Qt::AlignLeft);
+    nunchukPitch->setText("P: 0");
+
+    nunchukYaw = new QLabel(this);
+    nunchukYaw->setFixedWidth(140);
+    nunchukYaw->setAlignment(Qt::AlignLeft);
+    nunchukYaw->setText("Y: 0");
+
+
     nunchukAngle = new QLabel(this);
     nunchukAngle->setFixedWidth(140);
     nunchukAngle->setAlignment(Qt::AlignLeft);
@@ -362,6 +382,9 @@ QGroupBox *MainWindow::createWiiMoteGroupBox()
     wiiMoteGrid->addWidget(wiiMoteRoll,0,1);
     wiiMoteGrid->addWidget(wiiMotePitch,1,1);
     wiiMoteGrid->addWidget(wiiMoteYaw,2,1);
+    wiiMoteGrid->addWidget(nunchukRoll,0,3);
+    wiiMoteGrid->addWidget(nunchukPitch,1,3);
+    wiiMoteGrid->addWidget(nunchukYaw,2,3);
     wiiMoteGrid->addWidget(nunchukAngle,0,2);
     wiiMoteGrid->addWidget(nunchukMagnitude,1,2);
 
@@ -456,9 +479,8 @@ void MainWindow::velocitySliderChanged(int pos)
 void MainWindow::servo0SliderChanged(const int &pos)
 {
     servo0Label->setText("S0 = " + QString::number(convertPwmToDegreeSmall(pos)));
-    //if(pos%2==0){
     emit sendCommand("Servo0",QString::number(pos));
-    //}
+    m_visualisation->updateservo0(convertPwmToDegreeSmall(pos));
 }
 
 void MainWindow::servo0animationClicked()
@@ -479,6 +501,8 @@ void MainWindow::servo1SliderChanged(const int &pos)
 {
     servo1Label->setText("S1 = " + QString::number(convertPwmToDegreeBig(pos)));
     emit sendCommand("Servo1",QString::number(pos));
+    m_visualisation->updateservo1(convertPwmToDegreeSmall(pos));
+
 }
 
 void MainWindow::servo1animationClicked()
@@ -490,12 +514,15 @@ void MainWindow::servo1PowerOffClicked()
 {
     servo1Label->setText("S1 = OFF");
     emit sendCommand("Servo1",QString::number(0));
+
 }
 
 void MainWindow::servo2SliderChanged(const int &pos)
 {
     servo2Label->setText("S2 = " + QString::number(convertPwmToDegreeBig(pos)));
     emit sendCommand("Servo2",QString::number(pos));
+    m_visualisation->updateservo2(convertPwmToDegreeSmall(pos));
+
 }
 
 void MainWindow::servo2animationClicked()
@@ -575,6 +602,22 @@ void MainWindow::updateWiiMoteOrientation(const float &roll, const float &pitch,
     }
 
 
+}
+
+void MainWindow::updateNunchuckOrientation(const float &roll, const float &pitch, const float &yaw)
+{
+    int roll_i, pitch_i, yaw_i;
+    roll_i = roll;
+    pitch_i = pitch;
+    yaw_i = yaw;
+    nunchukRoll->setText("R: " + QString::number(roll_i));
+    nunchukPitch->setText("P: " + QString::number(pitch_i));
+    nunchukYaw->setText("Y: " + QString::number(yaw_i));
+
+    if(m_wiiMoteABstate){
+        //servo2Slider->setValue(pitch_i*(-1)+50);
+        servo1Slider->setValue(pitch_i*(-1)+100);
+    }
 }
 
 void MainWindow::updateNunchuckJoyStickData(const float &angle, const float &magnitude)

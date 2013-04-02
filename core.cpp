@@ -11,7 +11,7 @@ Core::Core(QObject *parent) :
     m_client = new TcpClient(this);
 
     m_arm = new RobotArm(this);
-    m_arm->updateAngles(M_PI_2,M_PI_2,M_PI_2,0,0);
+    m_arm->updateAngles(0,0,0,0,0);
 
     connect(m_mainwindow,SIGNAL(connectServer(QString,QString)),m_client,SLOT(connectToHost(QString,QString)));
     connect(m_mainwindow,SIGNAL(disconnectServer()),m_client,SLOT(disconnectFromHost()));
@@ -32,8 +32,6 @@ Core::Core(QObject *parent) :
     connect(m_mainwindow,SIGNAL(stopWiiMote()),this,SLOT(stopWiiProcess()));
     connect(m_mainwindow,SIGNAL(startWiiMote()),this,SLOT(startWiiProcess()));
     connect(m_wiiMoteThread,SIGNAL(finished()),this,SLOT(wiiProcessFinished()));
-
-
 }
 
 void Core::startWiiProcess()
@@ -47,8 +45,11 @@ void Core::startWiiProcess()
 
     connect(m_wiimote,SIGNAL(writeToTerminal(QString)),m_mainwindow,SLOT(writeToTerminal(QString)));
     connect(m_wiimote,SIGNAL(orientationWiiMoteChanged(float,float,float)),m_mainwindow,SLOT(updateWiiMoteOrientation(float,float,float)));
+    connect(m_wiimote,SIGNAL(orientationNunChuckChanged(float,float,float)),m_mainwindow,SLOT(updateNunchuckOrientation(float,float,float)));
+
     connect(m_wiimote,SIGNAL(nunchukJoystickChanged(float,float)),m_mainwindow,SLOT(updateNunchuckJoyStickData(float,float)));
     connect(m_wiimote,SIGNAL(button_AB_pressed(bool)),m_mainwindow,SLOT(wiiMoteABChanged(bool)));
+
 }
 
 void Core::stopWiiProcess()
