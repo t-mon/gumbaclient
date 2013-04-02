@@ -41,8 +41,7 @@ MainWindow::MainWindow(QWidget *parent) :
     mainGridLayout->addWidget(createGumbaServerConnectionGroupBox(),0,0);
     mainGridLayout->addWidget(createGumbaConnectionGroupBox(),0,1);
     mainGridLayout->addWidget(createGumbaSensorDataGroupBox(),0,2);
-    mainGridLayout->addWidget(m_visualisation,1,0,2,2);
-    //mainGridLayout->addWidget(createTerminalGroupBox(),1,0,1,2,Qt::AlignCenter);
+    mainGridLayout->addWidget(createTerminalGroupBox(),1,0,2,2,Qt::AlignCenter);
     mainGridLayout->addWidget(createServoControllGroupBox(),1,2);
     mainGridLayout->addWidget(createWiiMoteGroupBox(),2,2);
 
@@ -241,7 +240,7 @@ QGroupBox *MainWindow::createServoControllGroupBox()
     servo0Slider->setTickInterval(1);
     servo0Slider->setMinimum(downLimitSmall);
     servo0Slider->setMaximum(upLimitSmall);
-    servo0Slider->setValue(downLimitSmall);
+    servo0Slider->setValue((downLimitSmall+upLimitSmall)/2);
 
     servo0Label = new QLabel(this);
     servo0Label->setFixedWidth(60);
@@ -315,16 +314,25 @@ QGroupBox *MainWindow::createServoControllGroupBox()
 QGroupBox *MainWindow::createTerminalGroupBox()
 {
     QGroupBox *terminalGroupBox = new QGroupBox(tr("Terminal"),this);
-    QGridLayout *terminalGrid = new QGridLayout;
+    QVBoxLayout *terminalLayout = new QVBoxLayout;
+    terminalLayout->setSizeConstraint(QLayout::SetNoConstraint);
+    terminalGroupBox->setLayout(terminalLayout);
+
+    QTabWidget *tabs = new QTabWidget();
+    terminalLayout->addWidget(tabs);
 
     // Terminal
     terminalView = new QTextEdit(this);
-    terminalGrid->addWidget(terminalView,0,0);
+    //terminalGrid->addWidget(terminalView,0,0);
     terminalView->setMinimumWidth(550);
     terminalView->setMinimumHeight(400);
     terminalView->setReadOnly(true);
     terminalView->setTextColor(QColor(0, 255, 0,255));
-    terminalGroupBox->setLayout(terminalGrid);
+    //terminalGroupBox->setLayout(terminalGrid);
+
+
+    tabs->addTab(terminalView,tr("Terminal"));
+    tabs->addTab(m_visualisation,tr("Robotarm"));
 
     return terminalGroupBox;
 }

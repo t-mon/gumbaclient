@@ -29,32 +29,42 @@ void RobotVisualisation::paintGL()
 {
     glClear (GL_COLOR_BUFFER_BIT);
     glPushMatrix();
-    glTranslatef (-0.9, 0.0, 0.0);
+    glTranslatef (-1.0, 0.0, 0.0);
     glRotatef ((GLfloat) servo0, 0.0, 0.0, 1.0);
     glTranslatef (1.0, 0.0, 0.0);
     glPushMatrix();
     glScalef (2.0, 0.4, 1.0);
-    wireCube(0.8);
+    wireCube(1.0);
 
     glPopMatrix();
 
-    glTranslatef (0.9, 0.0, 0.0);
+    glTranslatef (1.0, 0.0, 0.0);
     glRotatef ((GLfloat) servo1, 0.0, 0.0, 1.0);
     glTranslatef (1.0, 0.0, 0.0);
     glPushMatrix();
     glScalef (2.0, 0.4, 1.0);
-    wireCube(0.8);
+    wireCube(1.0);
+    glPopMatrix();
 
     glPopMatrix();
 
-    glTranslatef (0.9, 0.0, 0.0);
-    glRotatef ((GLfloat) servo2, 0.0, 0.0, 1.0);
-    glTranslatef (1.0, 0.0, 0.0);
-    glPushMatrix();
-    glScalef (2.0, 0.4, 1.0);
-    wireCube(0.8);
 
-    glPopMatrix();
+
+//    glTranslatef (length, 0.0, 0.0);
+//    glRotatef ((GLfloat) servo1, 0.0, -length/2,1.0);
+//    glTranslatef (0.0, 0.0, 0.0);
+//    glPushMatrix();
+//    glScalef (2.0, 0.4, 1.0);
+//    wireCube(length);
+//    glPopMatrix();
+
+//    glTranslatef (2*length, 0.0, 0.0);
+//    glRotatef ((GLfloat) servo2, 0.0, -length/2,1.0);
+//    glTranslatef (0.0, 0.0, 0.0);
+//    glPushMatrix();
+//    glScalef (2.0, 0.4, 1.0);
+//    wireCube(length);
+//    glPopMatrix();
 
     glPopMatrix();
 
@@ -64,32 +74,39 @@ void RobotVisualisation::paintGL()
 void RobotVisualisation::wireCube(float length)
 {
 
+//    glBegin(GL_LINE_LOOP);
+//    glVertex2f(0, -length/6);
+//    glVertex2f(length, -length/6);
+//    glVertex2f(length, length/6);
+//    glVertex2f(0, length/6);
+//    glEnd();
+
     glBegin(GL_LINE_LOOP);
-    glVertex3f(-length/2, -length/2, length/2);
-    glVertex3f(length/2, -length/2, length/2);
-    glVertex3f(length/2, length/2, length/2);
-    glVertex3f(-length/2, length/2, length/2);
+      glVertex3f(-length/2, -length/2, length/2);
+      glVertex3f(length/2, -length/2, length/2);
+      glVertex3f(length/2, length/2, length/2);
+      glVertex3f(-length/2, length/2, length/2);
     glEnd();
 
     glBegin(GL_LINE_LOOP);
-    glVertex3f(-length/2, -length/2, -length/2);
-    glVertex3f(length/2, -length/2, -length/2);
-    glVertex3f(length/2, length/2, -length/2);
-    glVertex3f(-length/2, length/2, -length/2);
+      glVertex3f(-length/2, -length/2, -length/2);
+      glVertex3f(length/2, -length/2, -length/2);
+      glVertex3f(length/2, length/2, -length/2);
+      glVertex3f(-length/2, length/2, -length/2);
     glEnd();
 
     glBegin(GL_LINES);
-    glVertex3f(-length/2, -length/2, length/2);
-    glVertex3f(-length/2, -length/2, -length/2);
+      glVertex3f(-length/2, -length/2, length/2);
+      glVertex3f(-length/2, -length/2, -length/2);
 
-    glVertex3f(length/2, -length/2, length/2);
-    glVertex3f(length/2, -length/2, -length/2);
+      glVertex3f(length/2, -length/2, length/2);
+      glVertex3f(length/2, -length/2, -length/2);
 
-    glVertex3f(length/2, length/2, length/2);
-    glVertex3f(length/2, length/2, -length/2);
+      glVertex3f(length/2, length/2, length/2);
+      glVertex3f(length/2, length/2, -length/2);
 
-    glVertex3f(-length/2, length/2, length/2);
-    glVertex3f(-length/2, length/2, -length/2);
+      glVertex3f(-length/2, length/2, length/2);
+      glVertex3f(-length/2, length/2, -length/2);
     glEnd();
 }
 
