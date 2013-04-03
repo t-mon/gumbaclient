@@ -27,23 +27,24 @@ void RobotVisualisation::resizeGL(int w, int h)
 
 void RobotVisualisation::paintGL()
 {
+    GLfloat length = 0.9;
     glClear (GL_COLOR_BUFFER_BIT);
     glPushMatrix();
-    glTranslatef (-1.0, 0.0, 0.0);
+    glTranslatef (-length, 0.0, 0.0);
     glRotatef ((GLfloat) servo0, 0.0, 0.0, 1.0);
     glTranslatef (1.0, 0.0, 0.0);
     glPushMatrix();
     glScalef (2.0, 0.4, 1.0);
-    wireCube(1.0);
+    wireCube(length);
 
     glPopMatrix();
 
-    glTranslatef (1.0, 0.0, 0.0);
+    glTranslatef (length, 0.0, 0.0);
     glRotatef ((GLfloat) servo1, 0.0, 0.0, 1.0);
     glTranslatef (1.0, 0.0, 0.0);
     glPushMatrix();
     glScalef (2.0, 0.4, 1.0);
-    wireCube(1.0);
+    wireCube(length);
     glPopMatrix();
 
     glPopMatrix();
@@ -88,26 +89,34 @@ void RobotVisualisation::wireCube(float length)
       glVertex3f(-length/2, length/2, length/2);
     glEnd();
 
-    glBegin(GL_LINE_LOOP);
-      glVertex3f(-length/2, -length/2, -length/2);
-      glVertex3f(length/2, -length/2, -length/2);
-      glVertex3f(length/2, length/2, -length/2);
-      glVertex3f(-length/2, length/2, -length/2);
-    glEnd();
 
-    glBegin(GL_LINES);
-      glVertex3f(-length/2, -length/2, length/2);
-      glVertex3f(-length/2, -length/2, -length/2);
+//    glBegin(GL_LINE_LOOP);
+//      glVertex3f(-length/2, -length/2, length/2);
+//      glVertex3f(length/2, -length/2, length/2);
+//      glVertex3f(length/2, length/2, length/2);
+//      glVertex3f(-length/2, length/2, length/2);
+//    glEnd();
 
-      glVertex3f(length/2, -length/2, length/2);
-      glVertex3f(length/2, -length/2, -length/2);
+//    glBegin(GL_LINE_LOOP);
+//      glVertex3f(-length/2, -length/2, -length/2);
+//      glVertex3f(length/2, -length/2, -length/2);
+//      glVertex3f(length/2, length/2, -length/2);
+//      glVertex3f(-length/2, length/2, -length/2);
+//    glEnd();
 
-      glVertex3f(length/2, length/2, length/2);
-      glVertex3f(length/2, length/2, -length/2);
+//    glBegin(GL_LINES);
+//      glVertex3f(-length/2, -length/2, length/2);
+//      glVertex3f(-length/2, -length/2, -length/2);
 
-      glVertex3f(-length/2, length/2, length/2);
-      glVertex3f(-length/2, length/2, -length/2);
-    glEnd();
+//      glVertex3f(length/2, -length/2, length/2);
+//      glVertex3f(length/2, -length/2, -length/2);
+
+//      glVertex3f(length/2, length/2, length/2);
+//      glVertex3f(length/2, length/2, -length/2);
+
+//      glVertex3f(-length/2, length/2, length/2);
+//      glVertex3f(-length/2, length/2, -length/2);
+//    glEnd();
 }
 
 void RobotVisualisation::updateservo0(int degree)
@@ -126,4 +135,16 @@ void RobotVisualisation::updateservo2(int degree)
 {
     servo2 = degree % 360;
     updateGL();
+}
+
+void RobotVisualisation::updateservo3(int degree)
+{
+}
+
+void RobotVisualisation::updateservo4(int degree)
+{
+}
+
+void RobotVisualisation::updateservo5(int degree)
+{
 }

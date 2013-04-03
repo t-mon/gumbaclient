@@ -26,12 +26,16 @@ public:
 private:
     RobotVisualisation *m_visualisation;
 
+    QWidget *createGumbaGroupBox();
+    QWidget *createRobotarmGroupBox();
+    QWidget *createRobotWidget();
+
     QGroupBox *createGumbaConnectionGroupBox();
     QGroupBox *createGumbaSensorDataGroupBox();
     QGroupBox *createGumbaServerConnectionGroupBox();
     QGroupBox *createServoControllGroupBox();
     QGroupBox *createTerminalGroupBox();
-    QGroupBox *createWiiMoteGroupBox();
+    QWidget *createWiiMoteGroupBox();
 
 
     int convertPwmToDegreeBig(int pwm);
@@ -43,6 +47,9 @@ private:
     QPropertyAnimation *animationServo0;
     QPropertyAnimation *animationServo1;
     QPropertyAnimation *animationServo2;
+    QPropertyAnimation *animationServo3;
+    QPropertyAnimation *animationServo4;
+    QPropertyAnimation *animationServo5;
 
     QTextEdit *terminalView;
     QSlider *velocitySlider;
@@ -50,12 +57,17 @@ private:
 
     QSlider *servo0Slider;
     QLabel *servo0Label;
-
     QSlider *servo1Slider;
     QLabel *servo1Label;
-
     QSlider *servo2Slider;
     QLabel *servo2Label;
+    QSlider *servo3Slider;
+    QLabel *servo3Label;
+    QSlider *servo4Slider;
+    QLabel *servo4Label;
+    QSlider *servo5Slider;
+    QLabel *servo5Label;
+
 
     QLineEdit *hostLineEdit;
     QLineEdit *portLineEdit;
@@ -72,16 +84,23 @@ private:
 
     QLabel *batteryLabel;
 
+    // Wii
+    QLabel *wiiBatteryLabel;
     QLabel *wiiMoteRoll;
     QLabel *wiiMotePitch;
     QLabel *wiiMoteYaw;
-
     QLabel *nunchukRoll;
     QLabel *nunchukPitch;
     QLabel *nunchukYaw;
-
     QLabel *nunchukAngle;
     QLabel *nunchukMagnitude;
+    QLabel *classicLeftAngle;
+    QLabel *classicLeftMagnitude;
+    QLabel *classicRightAngle;
+    QLabel *classicRightMagnitude;
+    QLabel *guitarWhaa;
+    QLabel *guitarAngle;
+    QLabel *guitarMagnitude;
 
     bool m_wiiMoteABstate;
 
@@ -103,12 +122,28 @@ private slots:
     void servo2SliderChanged(const int &pos);
     void servo2animationClicked();
     void servo2PowerOffClicked();
+    void servo3SliderChanged(const int &pos);
+    void servo3animationClicked();
+    void servo3PowerOffClicked();
+    void servo4SliderChanged(const int &pos);
+    void servo4animationClicked();
+    void servo4PowerOffClicked();
+    void servo5SliderChanged(const int &pos);
+    void servo5animationClicked();
+    void servo5PowerOffClicked();
+
 
     void initServoClicked();
 
     void updateWiiMoteOrientation(const float &roll, const float &pitch, const float &yaw);
     void updateNunchuckOrientation(const float &roll, const float &pitch, const float &yaw);
     void updateNunchuckJoyStickData(const float &angle, const float &magnitude);
+    void updateClassicLeftJoyStickData(const float &angle, const float &magnitude);
+    void updateClassicRightJoyStickData(const float &angle, const float &magnitude);
+    void updateGuitarHeroJoyStickData(const float &angle, const float &magnitude);
+    void updateGuitarHeroWhaaData(const float &whaa);
+    void updateWiiBattery(const float &battery);
+
 
 signals:
     void connectServer(const QString &ipAddress, const QString &port);

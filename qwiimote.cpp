@@ -261,6 +261,7 @@ void QWiiMote::HandleStatus()
 {
     emit wiiMoteStatusChanged(m_wiiMote->GetID(),m_wiiMote->isUsingACC(),m_wiiMote->isUsingIR(),m_wiiMote->GetBatteryLevel());
     emit wiiLedChanged(m_wiiMote->isLEDSet(1), m_wiiMote->isLEDSet(2), m_wiiMote->isLEDSet(3),m_wiiMote->isLEDSet(4));
+    emit wiiBatteryChanged(m_wiiMote->GetBatteryLevel());
 }
 
 

@@ -48,6 +48,14 @@ void Core::startWiiProcess()
     connect(m_wiimote,SIGNAL(orientationNunChuckChanged(float,float,float)),m_mainwindow,SLOT(updateNunchuckOrientation(float,float,float)));
 
     connect(m_wiimote,SIGNAL(nunchukJoystickChanged(float,float)),m_mainwindow,SLOT(updateNunchuckJoyStickData(float,float)));
+    connect(m_wiimote,SIGNAL(classicJoystickLeftChanged(float,float)),m_mainwindow,SLOT(updateClassicLeftJoyStickData(float,float)));
+    connect(m_wiimote,SIGNAL(classicJoystickRightChanged(float,float)),m_mainwindow,SLOT(updateClassicRightJoyStickData(float,float)));
+
+    connect(m_wiimote,SIGNAL(guitarHeroJoystickChanged(float,float)),m_mainwindow,SLOT(updateGuitarHeroJoyStickData(float,float)));
+    connect(m_wiimote,SIGNAL(guitarHeroWhammyBarChanged(float)),m_mainwindow,SLOT(updateGuitarHeroWhaaData(float)));
+    connect(m_wiimote,SIGNAL(wiiBatteryChanged(float)),m_mainwindow,SLOT(updateWiiBattery(float)));
+
+
     connect(m_wiimote,SIGNAL(button_AB_pressed(bool)),m_mainwindow,SLOT(wiiMoteABChanged(bool)));
 
 }

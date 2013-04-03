@@ -16,8 +16,6 @@ public:
 
 private:
 
-
-
 protected:
     void initializeGL(void);
     void resizeGL( int w, int h );
@@ -28,6 +26,9 @@ public slots:
     void updateservo0(int degree);
     void updateservo1(int degree);
     void updateservo2(int degree);
+    void updateservo3(int degree);
+    void updateservo4(int degree);
+    void updateservo5(int degree);
 
 };
 

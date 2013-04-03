@@ -77,6 +77,7 @@ signals:
 
 
     // Wii general
+    void wiiBatteryChanged(const float &battery);
     void wiiMoteStatusChanged(const int &wiiMoteNumber, const bool &speakerStatus, const bool &irStatus, const float &battery);
     void wiiLedChanged(const int &led1, const int &led2, const int &led3, const int &led4);
     void updateOrientationWiiMoteKalman(float roll, float pitch, float yaw);
