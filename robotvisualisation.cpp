@@ -27,12 +27,12 @@ void RobotVisualisation::resizeGL(int w, int h)
 
 void RobotVisualisation::paintGL()
 {
-    GLfloat length = 0.9;
+    GLfloat length = 0.6;
     glClear (GL_COLOR_BUFFER_BIT);
     glPushMatrix();
     glTranslatef (-length, 0.0, 0.0);
     glRotatef ((GLfloat) servo0, 0.0, 0.0, 1.0);
-    glTranslatef (1.0, 0.0, 0.0);
+    glTranslatef (length, 0.0, 0.0);
     glPushMatrix();
     glScalef (2.0, 0.4, 1.0);
     wireCube(length);
@@ -41,7 +41,7 @@ void RobotVisualisation::paintGL()
 
     glTranslatef (length, 0.0, 0.0);
     glRotatef ((GLfloat) servo1, 0.0, 0.0, 1.0);
-    glTranslatef (1.0, 0.0, 0.0);
+    glTranslatef (length, 0.0, 0.0);
     glPushMatrix();
     glScalef (2.0, 0.4, 1.0);
     wireCube(length);
@@ -74,6 +74,8 @@ void RobotVisualisation::paintGL()
 
 void RobotVisualisation::wireCube(float length)
 {
+
+
 
 //    glBegin(GL_LINE_LOOP);
 //    glVertex2f(0, -length/6);

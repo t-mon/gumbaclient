@@ -7,6 +7,9 @@
 static int servo0 = 90;
 static int servo1 = -90;
 static int servo2 = 0;
+static int servo3 = 0;
+static int servo4 = 0;
+static int servo5 = 0;
 
 
 class RobotVisualisation : public QGLWidget

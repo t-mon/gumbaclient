@@ -501,10 +501,11 @@ QWidget *MainWindow::createWiiMoteGroupBox()
 
     // ============================================================ Wii
 
-    wiiBatteryLabel = new QLabel(this);
-    wiiBatteryLabel->setFixedWidth(140);
-    wiiBatteryLabel->setAlignment(Qt::AlignLeft);
-    wiiBatteryLabel->setText("Battery = 0");
+    wiiBatteryBar = new QProgressBar();
+    wiiBatteryBar->setFixedWidth(140);
+    wiiBatteryBar->setMinimum(0);
+    wiiBatteryBar->setMaximum(100);
+    wiiBatteryBar->setOrientation(Qt::Horizontal);
 
     wiiMoteRoll = new QLabel(this);
     wiiMoteRoll->setFixedWidth(140);
@@ -523,7 +524,7 @@ QWidget *MainWindow::createWiiMoteGroupBox()
 
     wiiGridLayout->addWidget(startWiiMoteButton,0,0);
     wiiGridLayout->addWidget(disconnectWiiMoteButton,1,0);
-    wiiGridLayout->addWidget(wiiBatteryLabel,2,0);
+    wiiGridLayout->addWidget(wiiBatteryBar,2,0);
 
     wiiGridLayout->addWidget(wiiMoteRoll,0,1);
     wiiGridLayout->addWidget(wiiMotePitch,1,1);
@@ -913,7 +914,7 @@ void MainWindow::updateWiiMoteOrientation(const float &roll, const float &pitch,
     wiiMoteYaw->setText("Yaw = " + QString::number(yaw_i));
 
     if(m_wiiMoteABstate){
-        servo2Slider->setValue(pitch_i*(-1)+50);
+        servo1Slider->setValue(pitch_i*(-1)+50);
         //servo1Slider->setValue(roll_i*(-1)+100);
     }
 
@@ -932,7 +933,7 @@ void MainWindow::updateNunchuckOrientation(const float &roll, const float &pitch
 
     if(m_wiiMoteABstate){
         //servo2Slider->setValue(pitch_i*(-1)+50);
-        servo1Slider->setValue(pitch_i*(-1)+100);
+        servo0Slider->setValue(pitch_i*(-1)+100);
     }
 }
 
@@ -967,7 +968,18 @@ void MainWindow::updateGuitarHeroWhaaData(const float &whaa)
 
 void MainWindow::updateWiiBattery(const float &battery)
 {
-    wiiBatteryLabel->setText("Battery = " + QString::number(battery));
+    int batteryPercent = battery*100;
+//    if(batteryPercent >= 30){
+//        wiiBatteryBar->setStyleSheet(wiiBatteryBar->property("defaultStyleSheet").toString() +" QProgressBar::chunk { background: green;}");
+//    }else{
+//        if(batteryPercent < 30){
+//            wiiBatteryBar->setStyleSheet(wiiBatteryBar->property("defaultStyleSheet").toString() +" QProgressBar::chunk { background: yellow;}");
+//        }
+//        if(batteryPercent < 15){
+//            wiiBatteryBar->setStyleSheet(wiiBatteryBar->property("defaultStyleSheet").toString() +" QProgressBar::chunk { background: red;}");
+//        }
+//    }
+    wiiBatteryBar->setValue(batteryPercent);
 }
 
 

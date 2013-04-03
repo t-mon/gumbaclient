@@ -8,6 +8,7 @@
 #include <QSlider>
 #include <QPropertyAnimation>
 #include <QGroupBox>
+#include <QProgressBar>
 
 #include "robotvisualisation.h"
 
@@ -85,7 +86,7 @@ private:
     QLabel *batteryLabel;
 
     // Wii
-    QLabel *wiiBatteryLabel;
+    QProgressBar *wiiBatteryBar;
     QLabel *wiiMoteRoll;
     QLabel *wiiMotePitch;
     QLabel *wiiMoteYaw;
