@@ -8,22 +8,20 @@
 #include <QKeyEvent>
 #include <QIcon>
 
-// PWM limits for servos (big servo, small sevo)
-// up-limit big     = 243 ms = +90
-// down-limit big   = 57  ms = -90
-// up-limit small   = 227 ms = +90
-// down-limit small = 50  ms = -90
-#define upLimitBig 243
-#define downLimitBig 57
-#define upLimitSmall 227
-#define downLimitSmall 50
-#define periodMove 5000
+
 
 #include "mainwindow.h"
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent)
 {
+    m_angle0 = (downLimitBig+upLimitBig)/2;
+    m_angle1 = (downLimitBig+upLimitBig)/2;
+    m_angle2 = (downLimitBig+upLimitBig)/2;
+    m_angle3 = (downLimitBig+upLimitBig)/2;
+    m_angle4 = (downLimitSmall+upLimitSmall)/2;
+    m_angle4 = (downLimitSmall+upLimitSmall)/2;
+
     m_wiiMoteABstate = false;
 
     QWidget *centralWidget = new QWidget(this);
@@ -171,6 +169,7 @@ QGroupBox *MainWindow::createGumbaSensorDataGroupBox()
 
     motorRightLabel = new QLabel(this);
     motorRightLabel->setText("Motor R: 0");
+    motorRightLabel->setFixedWidth(150);
 
     lightLeftLabel = new QLabel(this);
     lightLeftLabel->setText("Light L: 0");
@@ -178,10 +177,12 @@ QGroupBox *MainWindow::createGumbaSensorDataGroupBox()
     lightRightLabel = new QLabel(this);
     lightRightLabel->setText("Light R: 0");
 
-    batteryLabel = new QLabel(this);
-    batteryLabel->setText("0 V");
-    batteryLabel->setAlignment(Qt::AlignCenter);
-    batteryLabel->setStyleSheet("background-color:gray; border-radius: 5px;");
+
+    gumbaBatteryBar = new QProgressBar();
+    gumbaBatteryBar->setFixedWidth(150);
+    gumbaBatteryBar->setMinimum(550);
+    gumbaBatteryBar->setMaximum(880);
+    gumbaBatteryBar->setOrientation(Qt::Horizontal);
 
     velocitySlider = new QSlider(Qt::Horizontal, this);
     velocitySlider->setTickInterval(1);
@@ -201,7 +202,7 @@ QGroupBox *MainWindow::createGumbaSensorDataGroupBox()
     gumbaSensorDataGrid->addWidget(motorRightLabel,2,1);
     gumbaSensorDataGrid->addWidget(lightLeftLabel,3,0);
     gumbaSensorDataGrid->addWidget(lightRightLabel,3,1);
-    gumbaSensorDataGrid->addWidget(batteryLabel,4,0);
+    gumbaSensorDataGrid->addWidget(gumbaBatteryBar,4,0);
     gumbaSensorDataGrid->addWidget(velocitySlider,5,0);
     gumbaSensorDataGrid->addWidget(velocityLabel,5,1);
 
@@ -255,6 +256,8 @@ QGroupBox *MainWindow::createServoControllGroupBox()
     QGridLayout *servoControllGrid = new QGridLayout;
 
     QPushButton *initServo = new QPushButton("Servo init");
+    QPushButton *servoHomePositionButton = new QPushButton("HomePosition");
+
     QPushButton *servoAllPwmOff = new QPushButton("All Servos OFF");
     QPushButton *servo0animationButton = new QPushButton("Start animation");
     QPushButton *servo0poweOffButton = new QPushButton("Power OFF");
@@ -298,9 +301,9 @@ QGroupBox *MainWindow::createServoControllGroupBox()
     servo0Slider = new QSlider(Qt::Horizontal, this);
     servo0Slider->setFixedWidth(100);
     servo0Slider->setTickInterval(1);
-    servo0Slider->setMinimum(downLimitSmall);
-    servo0Slider->setMaximum(upLimitSmall);
-    servo0Slider->setValue((downLimitSmall+upLimitSmall)/2);
+    servo0Slider->setMinimum(downLimitBig);
+    servo0Slider->setMaximum(upLimitBig);
+    servo0Slider->setValue((downLimitBig+upLimitBig)/2);
 
     servo0Label = new QLabel(this);
     servo0Label->setFixedWidth(60);
@@ -348,9 +351,9 @@ QGroupBox *MainWindow::createServoControllGroupBox()
     servo4Slider = new QSlider(Qt::Horizontal, this);
     servo4Slider->setFixedWidth(100);
     servo4Slider->setTickInterval(1);
-    servo4Slider->setMinimum(downLimitBig);
-    servo4Slider->setMaximum(upLimitBig);
-    servo4Slider->setValue((downLimitBig+upLimitBig)/2);
+    servo4Slider->setMinimum(downLimitSmall);
+    servo4Slider->setMaximum(upLimitSmall);
+    servo4Slider->setValue((downLimitSmall+upLimitSmall)/2);
 
     servo4Label = new QLabel(this);
     servo4Label->setAlignment(Qt::AlignCenter);
@@ -360,9 +363,9 @@ QGroupBox *MainWindow::createServoControllGroupBox()
     servo5Slider = new QSlider(Qt::Horizontal, this);
     servo5Slider->setFixedWidth(100);
     servo5Slider->setTickInterval(1);
-    servo5Slider->setMinimum(downLimitBig);
-    servo5Slider->setMaximum(upLimitBig);
-    servo5Slider->setValue((downLimitBig+upLimitBig)/2);
+    servo5Slider->setMinimum(downLimitSmall);
+    servo5Slider->setMaximum(upLimitSmall);
+    servo5Slider->setValue((downLimitSmall+upLimitSmall)/2);
 
     servo5Label = new QLabel(this);
     servo5Label->setAlignment(Qt::AlignCenter);
@@ -415,14 +418,17 @@ QGroupBox *MainWindow::createServoControllGroupBox()
 
     servoControllGrid->addWidget(initServo,0,0);
     servoControllGrid->addWidget(servoAllPwmOff,1,0);
-    servoControllGrid->addWidget(servo0GroupBox,2,0);
-    servoControllGrid->addWidget(servo1GroupBox,3,0);
-    servoControllGrid->addWidget(servo2GroupBox,4,0);
-    servoControllGrid->addWidget(servo3GroupBox,5,0);
-    servoControllGrid->addWidget(servo4GroupBox,6,0);
-    servoControllGrid->addWidget(servo5GroupBox,7,0);
+    servoControllGrid->addWidget(servoHomePositionButton,2,0);
+
+    servoControllGrid->addWidget(servo0GroupBox,3,0);
+    servoControllGrid->addWidget(servo1GroupBox,4,0);
+    servoControllGrid->addWidget(servo2GroupBox,5,0);
+    servoControllGrid->addWidget(servo3GroupBox,6,0);
+    servoControllGrid->addWidget(servo4GroupBox,7,0);
+    servoControllGrid->addWidget(servo5GroupBox,8,0);
 
     connect(initServo,SIGNAL(clicked()),this,SLOT(initServoClicked()));
+    connect(servoHomePositionButton,SIGNAL(clicked()),this,SLOT(servoHomePositionClicked()));
     connect(servoAllPwmOff,SIGNAL(clicked()),this,SLOT(allSevosPwmOff()));
 
     connect(servo0Slider,SIGNAL(valueChanged(int)),this,SLOT(servo0SliderChanged(int)));
@@ -623,26 +629,26 @@ QWidget *MainWindow::createWiiMoteGroupBox()
     return wiiWidget;
 }
 
-int MainWindow::convertPwmToDegreeBig(int pwm)
+float MainWindow::convertPwmToDegreeBig(int pwm)
 {
     // up-limit     = 249 ms = +90
     // down-limit   = 57  ms = -90
     return (180*(pwm-downLimitBig)/(upLimitBig-downLimitBig))-90;
 }
 
-int MainWindow::convertPwmToDegreeSmall(int pwm)
+float MainWindow::convertPwmToDegreeSmall(int pwm)
 {
     // up-limit     = 249 ms = +90
     // down-limit   = 57  ms = -90
     return (180*(pwm-downLimitSmall)/(upLimitSmall-downLimitSmall))-90;
 }
 
-int MainWindow::convertDegreeToPwmBig(int degree)
+int MainWindow::convertDegreeToPwmBig(float degree)
 {
     return ((degree-90)*(upLimitBig-downLimitBig)-(180*downLimitBig))/180;
 }
 
-int MainWindow::convertDegreeToPwmSmall(int degree)
+int MainWindow::convertDegreeToPwmSmall(float degree)
 {
     return ((degree-90)*(upLimitSmall-downLimitSmall)-(180*downLimitSmall))/180;
 }
@@ -705,16 +711,15 @@ void MainWindow::velocitySliderChanged(int pos)
 
 void MainWindow::servo0SliderChanged(const int &pos)
 {
-    servo0Label->setText("S0 = " + QString::number(convertPwmToDegreeSmall(pos)));
+    servo0Label->setText("S0 = " + QString::number(convertPwmToDegreeBig(pos)));
     emit sendCommand("Servo0",QString::number(pos));
-    m_visualisation->updateservo0(convertPwmToDegreeSmall(pos));
+    m_angle0 = (pos);
+    m_visualisation->updateservo0(convertPwmToDegreeBig(pos));
 }
 
 void MainWindow::servo0animationClicked()
 {
-    moveServo(0,upLimitSmall,downLimitSmall,periodMove);
-    moveServo(1,upLimitBig,downLimitBig,periodMove);
-    moveServo(2,upLimitBig,downLimitBig,periodMove);
+    moveServo(0,m_angle0,(downLimitBig+upLimitBig)/2,periodMove);
 
 }
 
@@ -729,13 +734,14 @@ void MainWindow::servo1SliderChanged(const int &pos)
 {
     servo1Label->setText("S1 = " + QString::number(convertPwmToDegreeBig(pos)));
     emit sendCommand("Servo1",QString::number(pos));
-    m_visualisation->updateservo1(convertPwmToDegreeSmall(pos));
+    m_angle1 = (pos);
+    m_visualisation->updateservo1(convertPwmToDegreeBig(pos));
 
 }
 
 void MainWindow::servo1animationClicked()
 {
-    moveServo(1,downLimitBig,upLimitBig,periodMove);
+    moveServo(1,m_angle1,(downLimitBig+upLimitBig)/2,periodMove);
 }
 
 void MainWindow::servo1PowerOffClicked()
@@ -750,13 +756,14 @@ void MainWindow::servo2SliderChanged(const int &pos)
 {
     servo2Label->setText("S2 = " + QString::number(convertPwmToDegreeBig(pos)));
     emit sendCommand("Servo2",QString::number(pos));
-    m_visualisation->updateservo2(convertPwmToDegreeSmall(pos));
+    m_angle2 = pos;
+    m_visualisation->updateservo2(convertPwmToDegreeBig(pos));
 
 }
 
 void MainWindow::servo2animationClicked()
 {
-    moveServo(2,downLimitBig,upLimitBig,periodMove);
+    moveServo(2,m_angle2,(downLimitBig+upLimitBig)/2,periodMove);
 }
 
 void MainWindow::servo2PowerOffClicked()
@@ -770,12 +777,13 @@ void MainWindow::servo3SliderChanged(const int &pos)
 {
     servo3Label->setText("S3 = " + QString::number(convertPwmToDegreeBig(pos)));
     emit sendCommand("Servo3",QString::number(pos));
-    m_visualisation->updateservo3(convertPwmToDegreeSmall(pos));
+    m_angle3 = (pos);
+    m_visualisation->updateservo3(convertPwmToDegreeBig(pos));
 }
 
 void MainWindow::servo3animationClicked()
 {
-    moveServo(3,downLimitBig,upLimitBig,periodMove);
+    moveServo(3,m_angle3,(downLimitBig+upLimitBig)/2,periodMove);
 }
 
 void MainWindow::servo3PowerOffClicked()
@@ -787,14 +795,15 @@ void MainWindow::servo3PowerOffClicked()
 
 void MainWindow::servo4SliderChanged(const int &pos)
 {
-    servo4Label->setText("S4 = " + QString::number(convertPwmToDegreeBig(pos)));
+    servo4Label->setText("S4 = " + QString::number(convertPwmToDegreeSmall(pos)));
     emit sendCommand("Servo4",QString::number(pos));
+    m_angle4 = (pos);
     m_visualisation->updateservo4(convertPwmToDegreeSmall(pos));
 }
 
 void MainWindow::servo4animationClicked()
 {
-    moveServo(4,downLimitBig,upLimitBig,periodMove);
+    moveServo(4,m_angle4,(downLimitSmall+upLimitSmall)/2,periodMove);
 }
 
 void MainWindow::servo4PowerOffClicked()
@@ -806,14 +815,15 @@ void MainWindow::servo4PowerOffClicked()
 
 void MainWindow::servo5SliderChanged(const int &pos)
 {
-    servo5Label->setText("S5 = " + QString::number(convertPwmToDegreeBig(pos)));
+    servo5Label->setText("S5 = " + QString::number(convertPwmToDegreeSmall(pos)));
     emit sendCommand("Servo5",QString::number(pos));
+    m_angle5 = (pos);
     m_visualisation->updateservo5(convertPwmToDegreeSmall(pos));
 }
 
 void MainWindow::servo5animationClicked()
 {
-    moveServo(5,downLimitBig,upLimitBig,periodMove);
+    moveServo(5,m_angle5,(downLimitSmall+upLimitSmall)/2,periodMove);
 }
 
 void MainWindow::servo5PowerOffClicked()
@@ -903,6 +913,17 @@ void MainWindow::initServoClicked()
     emit sendCommand("Servo","init");
 }
 
+void MainWindow::servoHomePositionClicked()
+{
+    moveServo(0,(m_angle0),(downLimitBig+upLimitBig)/2,periodMove);
+    moveServo(1,(m_angle1),(downLimitBig+upLimitBig)/2,periodMove);
+    moveServo(2,(m_angle2),(downLimitBig+upLimitBig)/2,periodMove);
+    moveServo(3,(m_angle3),(downLimitBig+upLimitBig)/2,periodMove);
+    moveServo(4,(m_angle4),(downLimitSmall+upLimitSmall)/2,periodMove);
+    moveServo(5,(m_angle5),(downLimitSmall+upLimitSmall)/2,periodMove);
+
+}
+
 void MainWindow::updateWiiMoteOrientation(const float &roll, const float &pitch, const float &yaw)
 {
     int roll_i, pitch_i, yaw_i;
@@ -914,8 +935,7 @@ void MainWindow::updateWiiMoteOrientation(const float &roll, const float &pitch,
     wiiMoteYaw->setText("Yaw = " + QString::number(yaw_i));
 
     if(m_wiiMoteABstate){
-        servo1Slider->setValue(pitch_i*(-1)+50);
-        //servo1Slider->setValue(roll_i*(-1)+100);
+        servo2Slider->setValue(pitch_i*(-1)+50);
     }
 
 
@@ -932,7 +952,6 @@ void MainWindow::updateNunchuckOrientation(const float &roll, const float &pitch
     nunchukYaw->setText("Yaw = " + QString::number(yaw_i));
 
     if(m_wiiMoteABstate){
-        //servo2Slider->setValue(pitch_i*(-1)+50);
         servo0Slider->setValue(pitch_i*(-1)+100);
     }
 }
@@ -1060,7 +1079,7 @@ void MainWindow::lightRight(int lightIntensity)
 
 void MainWindow::batteryStatus(double battery)
 {
-    batteryLabel->setText(QString::number(battery)+" V");
+    gumbaBatteryBar->setValue(battery);
 }
 
 void MainWindow::wiiMoteABChanged(const bool &pressedState)

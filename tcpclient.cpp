@@ -104,7 +104,7 @@ void TcpClient::readGumbaData(QString gumbaString)
                 double lightR = sensors.value("energy").toMap().value("light_r").toDouble();
                 double lightL = sensors.value("energy").toMap().value("light_l").toDouble();
 
-                ubat = ubat/100;
+                //ubat = ubat/100;
 
                 emit motorLeft(iMotorL);
                 emit motorRight(iMotorR);

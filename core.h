@@ -20,7 +20,7 @@ private:
     TcpClient * m_client;
     QThread *m_wiiMoteThread;
     RobotArm *m_arm;
-
+    float degreeToRadiant(float degree);
 signals:
     
 private slots:

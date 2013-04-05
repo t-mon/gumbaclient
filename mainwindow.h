@@ -12,6 +12,17 @@
 
 #include "robotvisualisation.h"
 
+// PWM limits for servos (big servo, small sevo)
+// up-limit big     = 243 ms = +90
+// down-limit big   = 57  ms = -90
+// up-limit small   = 227 ms = +90
+// down-limit small = 50  ms = -90
+#define upLimitBig 243
+#define downLimitBig 57
+#define upLimitSmall 227
+#define downLimitSmall 50
+#define periodMove 2000
+
 namespace Ui {
 class MainWindow;
 }
@@ -38,12 +49,19 @@ private:
     QGroupBox *createTerminalGroupBox();
     QWidget *createWiiMoteGroupBox();
 
+    float m_angle0;
+    float m_angle1;
+    float m_angle2;
+    float m_angle3;
+    float m_angle4;
+    float m_angle5;
 
-    int convertPwmToDegreeBig(int pwm);
-    int convertPwmToDegreeSmall(int pwm);
 
-    int convertDegreeToPwmBig(int degree);
-    int convertDegreeToPwmSmall(int degree);
+    float convertPwmToDegreeBig(int pwm);
+    float convertPwmToDegreeSmall(int pwm);
+
+    int convertDegreeToPwmBig(float degree);
+    int convertDegreeToPwmSmall(float degree);
 
     QPropertyAnimation *animationServo0;
     QPropertyAnimation *animationServo1;
@@ -83,7 +101,7 @@ private:
     QLabel *lightLeftLabel;
     QLabel *lightRightLabel;
 
-    QLabel *batteryLabel;
+    QProgressBar *gumbaBatteryBar;
 
     // Wii
     QProgressBar *wiiBatteryBar;
@@ -135,7 +153,7 @@ private slots:
 
 
     void initServoClicked();
-
+    void servoHomePositionClicked();
     void updateWiiMoteOrientation(const float &roll, const float &pitch, const float &yaw);
     void updateNunchuckOrientation(const float &roll, const float &pitch, const float &yaw);
     void updateNunchuckJoyStickData(const float &angle, const float &magnitude);
@@ -150,8 +168,12 @@ signals:
     void connectServer(const QString &ipAddress, const QString &port);
     void sendCommand(QString,QString);
 
+    void angle0Changed();
     void angle1Changed();
     void angle2Changed();
+    void angle3Changed();
+    void angle4Changed();
+    void angle5Changed();
 
     void startWiiMote();
     void stopWiiMote();

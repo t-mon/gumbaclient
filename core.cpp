@@ -11,7 +11,7 @@ Core::Core(QObject *parent) :
     m_client = new TcpClient(this);
 
     m_arm = new RobotArm(this);
-    m_arm->updateAngles(0,0,0,0,0);
+    m_arm->updateAngles(0,-M_PI_2,0,M_PI_2,0);
 
     connect(m_mainwindow,SIGNAL(connectServer(QString,QString)),m_client,SLOT(connectToHost(QString,QString)));
     connect(m_mainwindow,SIGNAL(disconnectServer()),m_client,SLOT(disconnectFromHost()));
@@ -32,6 +32,11 @@ Core::Core(QObject *parent) :
     connect(m_mainwindow,SIGNAL(stopWiiMote()),this,SLOT(stopWiiProcess()));
     connect(m_mainwindow,SIGNAL(startWiiMote()),this,SLOT(startWiiProcess()));
     connect(m_wiiMoteThread,SIGNAL(finished()),this,SLOT(wiiProcessFinished()));
+}
+
+float Core::degreeToRadiant(float degree)
+{
+    return degree * M_PI / 180;
 }
 
 void Core::startWiiProcess()

@@ -12,23 +12,34 @@ public:
     
 private:
     void homePosition();
-    int m_theta1;
-    int m_theta2;
-    int m_theta3;
-    int m_theta4;
-    int m_theta5;
+    float m_theta1;
+    float m_theta2;
+    float m_theta3;
+    float m_theta4;
+    float m_theta5;
+
+    QMatrix4x4 m_koordinateSystem_01;
+    QMatrix4x4 m_koordinateSystem_12;
+    QMatrix4x4 m_koordinateSystem_23;
+    QMatrix4x4 m_koordinateSystem_34;
+    QMatrix4x4 m_koordinateSystem_45;
+
+
 
 signals:
     void moveServo();
     void anglesUpdated();
 
 private slots:
+
     QMatrix4x4 transform05();
+
+
     void transformPositionToAngle();
     void transformAngleToPosition();
 
 public slots:
-    void updateAngles(int theta1, int theta2, int theta3, int theta4, int theta5);
+    void updateAngles(float theta1, float theta2, float theta3, float theta4, float theta5);
     
 };
 

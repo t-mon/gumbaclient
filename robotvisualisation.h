@@ -4,26 +4,40 @@
 #include <QGLWidget>
 #include <qgl.h>
 
-static int servo0 = 90;
-static int servo1 = -90;
-static int servo2 = 0;
-static int servo3 = 0;
-static int servo4 = 0;
-static int servo5 = 0;
+static float servo0 = 0;
+static float servo1 = 90;
+static float servo2 = -90;
+static float servo3 = -90;
+static float servo4 = 0;
+static float servo5 = 0;
+
+//  HOME POSITION on -> 0,0,0,0,0
+//    _______
+//    |     |
+//    |
+//    |
+//--------------
+//
+//       1         0         0       100
+// T05 = 0        -1         0         0
+//       0         0        -1       100
+//       0         0         0         1
 
 
 class RobotVisualisation : public QGLWidget
 {
 public:
-    RobotVisualisation();
+    RobotVisualisation(QObject *parent = 0);
 
 private:
 
 protected:
     void initializeGL(void);
-    void resizeGL( int w, int h );
+    void resizeGL( GLint w, GLint h );
     void paintGL();
-    void wireCube(float length);
+    void wireCube(GLdouble length);
+    void armRectangle();
+    void wristRectangle(float length);
 
 public slots:
     void updateservo0(int degree);
