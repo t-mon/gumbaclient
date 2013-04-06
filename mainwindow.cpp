@@ -455,6 +455,16 @@ QGroupBox *MainWindow::createServoControllGroupBox()
     return servoControllGroupBox;
 }
 
+QGroupBox *MainWindow::createServoPositionGroupBox()
+{
+    QGroupBox *createServoPositionGroupBox = new QGroupBox(tr("Servo Position"),this);
+    QVBoxLayout *servoPositionLayout = new QVBoxLayout;
+    createServoPositionGroupBox->setLayout(servoPositionLayout);
+
+
+    return createServoPositionGroupBox;
+}
+
 QGroupBox *MainWindow::createTerminalGroupBox()
 {
     QGroupBox *terminalGroupBox = new QGroupBox(tr("Terminal"),this);
@@ -854,52 +864,55 @@ void MainWindow::allSevosPwmOff()
 
 void MainWindow::moveServo(const int &servoNumber, const int &start, const int &end, const int &period)
 {
+    //Linear
     //OutBounce
     //InOutExpo
     //InOutCubic
     //InOutQuint
+
+    QEasingCurve movementCurve = QEasingCurve::InOutExpo;
 
     switch(servoNumber){
     case 0:
         animationServo0->setDuration(period);
         animationServo0->setStartValue(start);
         animationServo0->setEndValue(end);
-        animationServo0->setEasingCurve(QEasingCurve::InOutQuint);
+        animationServo0->setEasingCurve(movementCurve);
         animationServo0->start();
         break;
     case 1:
         animationServo1->setDuration(period);
         animationServo1->setStartValue(start);
         animationServo1->setEndValue(end);
-        animationServo1->setEasingCurve(QEasingCurve::InOutQuint);
+        animationServo1->setEasingCurve(movementCurve);
         animationServo1->start();
         break;
     case 2:
         animationServo2->setDuration(period);
         animationServo2->setStartValue(start);
         animationServo2->setEndValue(end);
-        animationServo2->setEasingCurve(QEasingCurve::InOutQuint);
+        animationServo2->setEasingCurve(movementCurve);
         animationServo2->start();
         break;
     case 3:
         animationServo3->setDuration(period);
         animationServo3->setStartValue(start);
         animationServo3->setEndValue(end);
-        animationServo3->setEasingCurve(QEasingCurve::InOutQuint);
+        animationServo3->setEasingCurve(movementCurve);
         animationServo3->start();
         break;
     case 4:
         animationServo4->setDuration(period);
         animationServo4->setStartValue(start);
         animationServo4->setEndValue(end);
-        animationServo4->setEasingCurve(QEasingCurve::InOutQuint);
+        animationServo4->setEasingCurve(movementCurve);
         animationServo4->start();
         break;
     case 5:
         animationServo5->setDuration(period);
         animationServo5->setStartValue(start);
         animationServo5->setEndValue(end);
-        animationServo5->setEasingCurve(QEasingCurve::InOutQuint);
+        animationServo5->setEasingCurve(movementCurve);
         animationServo5->start();
         break;
     default:

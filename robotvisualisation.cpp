@@ -4,8 +4,26 @@
 #include "robotvisualisation.h"
 
 
+//  HOME POSITION on -> 0,0,0,0,0
+//    _______
+//    |     |
+//    |
+//    |
+//--------------
+//
+//       1         0         0       100
+// T05 = 0        -1         0         0
+//       0         0        -1       100
+//       0         0         0         1
 
-RobotVisualisation::RobotVisualisation(QObject *parent)
+static float servo0 = 0;
+static float servo1 = 90;
+static float servo2 = -90;
+static float servo3 = -90;
+static float servo4 = 0;
+static float servo5 = 0;
+
+RobotVisualisation::RobotVisualisation()
 {
 }
 
@@ -51,10 +69,10 @@ void RobotVisualisation::paintGL()
     glPopMatrix();
 
     glTranslatef (length, 0.0, 0.0);
-    glRotatef ((GLfloat) servo3, 0.0, 0.0, 1.0);
-    glTranslatef (length, 0.0, 0.0);
+    glRotatef ((GLfloat) servo3+90, 0.0, 0.0, 1.0);
+    glTranslatef (length/2, 0.0, 0.0);
     glPushMatrix();
-    glScalef (2.0, 0.4, 1.0);
+    glScalef (1.0, 0.4, 1.0);
     wireCube(length);
     glPopMatrix();
 

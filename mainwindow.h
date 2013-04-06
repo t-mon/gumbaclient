@@ -46,6 +46,8 @@ private:
     QGroupBox *createGumbaSensorDataGroupBox();
     QGroupBox *createGumbaServerConnectionGroupBox();
     QGroupBox *createServoControllGroupBox();
+    QGroupBox *createServoPositionGroupBox();
+
     QGroupBox *createTerminalGroupBox();
     QWidget *createWiiMoteGroupBox();
 

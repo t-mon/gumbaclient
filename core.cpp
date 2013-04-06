@@ -11,7 +11,7 @@ Core::Core(QObject *parent) :
     m_client = new TcpClient(this);
 
     m_arm = new RobotArm(this);
-    m_arm->updateAngles(0,-M_PI_2,0,M_PI_2,0);
+    m_arm->updateAngles(0,0,0,0,0);
 
     connect(m_mainwindow,SIGNAL(connectServer(QString,QString)),m_client,SLOT(connectToHost(QString,QString)));
     connect(m_mainwindow,SIGNAL(disconnectServer()),m_client,SLOT(disconnectFromHost()));
