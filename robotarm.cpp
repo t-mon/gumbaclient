@@ -1,7 +1,7 @@
 #include "robotarm.h"
 #include <math.h>
 
-#define L1 50
+#define L1 0
 #define L2 100
 #define L3 100
 #define L4 50
@@ -18,55 +18,53 @@ RobotArm::RobotArm(QObject *parent) :
 void RobotArm::homePosition()
 {
     //  HOME POSITION on -> 0,0,0,0,0
-    //    _____ __
+    //    __L3___ _L4_
     //    |
-    //    |
-    //    |
+    //    |_L2
+    //    |_L1
     //--------------
     //
     //       0         0         1       150
     // T05 = 0        -1         0         0
     //       1         0         0       150
     //       0         0         0         1
-
-
-
-
     ///////////////////////
+
+
     m_theta1 = 0;
     m_theta2 = 0;
     m_theta3 = 0;
     m_theta4 = 0;
     m_theta5 = 0;
-    qDebug() << "Koordinat-transformation resettet to home position";
+    writeToTerminal("Koordinat-transformation resettet to home position");
 }
 
 QMatrix4x4 RobotArm::transform05()
 {
-    QMatrix4x4 T01(cos(m_theta1),   0,              sin(m_theta1),      0,
-                   sin(m_theta1),   0,              -cos(m_theta1),     0,
-                   0,               1,               0,                 L1,
-                   0,               0,               0,                 1);
+    QMatrix4x4 T01(cos(m_theta1),                   0,                  sin(m_theta1),          0,
+                   sin(m_theta1),                   0,                  -cos(m_theta1),         0,
+                   0,                               1,                  0,                      L1,
+                   0,                               0,                  0,                      1);
 
-    QMatrix4x4 T12(cos(m_theta2+M_PI_2),   -sin(m_theta2+M_PI_2),  0,                 L2*cos(m_theta2+M_PI_2),
-                   sin(m_theta2+M_PI_2),   cos(m_theta2+M_PI_2),   0,                 L2*sin(m_theta2+M_PI_2),
-                   0,               0,               1,                 0,
-                   0,               0,               0,                 1);
+    QMatrix4x4 T12(cos(m_theta2+M_PI_2),   -sin(m_theta2+M_PI_2),       0,                      L2*cos(m_theta2+M_PI_2),
+                   sin(m_theta2+M_PI_2),   cos(m_theta2+M_PI_2),        0,                      L2*sin(m_theta2+M_PI_2),
+                   0,                               0,                  1,                      0,
+                   0,                               0,                   0,                     1);
 
-    QMatrix4x4 T23(cos(m_theta3-M_PI_2),   -sin(m_theta3-M_PI_2),  0,                 L3*cos(m_theta3-M_PI_2),
-                   sin(m_theta3-M_PI_2),   cos(m_theta3-M_PI_2),   0,                 L3*sin(m_theta3-M_PI_2),
-                   0,               0,               1,                 0,
-                   0,               0,               0,                 1);
+    QMatrix4x4 T23(cos(m_theta3-M_PI_2),   -sin(m_theta3-M_PI_2),       0,                      L3*cos(m_theta3-M_PI_2),
+                   sin(m_theta3-M_PI_2),   cos(m_theta3-M_PI_2),        0,                      L3*sin(m_theta3-M_PI_2),
+                   0,                               0,                  1,                      0,
+                   0,                               0,                  0,                      1);
 
-    QMatrix4x4 T34(cos(m_theta4+M_PI_2),   0,               sin(m_theta4+M_PI_2),    0,
-                   sin(m_theta4+M_PI_2),   0,               -cos(m_theta4+M_PI_2),     0,
-                   0,               1,               0,                 0,
-                   0,               0,               0,                 1);
+    QMatrix4x4 T34(cos(m_theta4+M_PI_2),            0,                  sin(m_theta4+M_PI_2),   0,
+                   sin(m_theta4+M_PI_2),            0,                  -cos(m_theta4+M_PI_2),  0,
+                   0,                               1,                  0,                      0,
+                   0,                               0,                  0,                      1);
 
-    QMatrix4x4 T45(cos(m_theta5),   -sin(m_theta5),  0,                 0,
-                   sin(m_theta5),   cos(m_theta5),   0,                 0,
-                   0,               0,               1,                 L4,
-                   0,               0,               0,                 1);
+    QMatrix4x4 T45(cos(m_theta5),       -sin(m_theta5),                 0,                      0,
+                   sin(m_theta5),       cos(m_theta5),                  0,                      0,
+                   0,                   0,                              1,                      L4,
+                   0,                   0,                              0,                      1);
 
     QMatrix4x4 T02=T01*T12;
     QMatrix4x4 T03=T01*T12*T23;
@@ -95,6 +93,12 @@ QMatrix4x4 RobotArm::transform05()
 
     QGenericMatrix<5,6,float> jakobi;
 
+    float x = T05.column(3).toVector3D().x();
+    float y = T05.column(3).toVector3D().y();
+    float z = T05.column(3).toVector3D().z();
+
+    emit updateTcpPosition((float)((int)(x*1000))/1000,(float)((int)(y*1000))/1000,(float)((int)(z*1000))/1000);
+
     return T05;
 }
 
@@ -110,11 +114,11 @@ void RobotArm::transformAngleToPosition()
 
 void RobotArm::updateAngles(float theta1, float theta2, float theta3, float theta4, float theta5)
 {
-    m_theta1 = theta1;
-    m_theta2 = theta2;
-    m_theta3 = theta3;
-    m_theta4 = theta4;
-    m_theta5 = theta5;
+    m_theta1 = theta1*M_PI/180;
+    m_theta2 = theta2*M_PI/180;
+    m_theta3 = theta3*M_PI/180;
+    m_theta4 = theta4*M_PI/180;
+    m_theta5 = theta5*M_PI/180;
     emit anglesUpdated();
 }
 

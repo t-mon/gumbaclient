@@ -25,12 +25,18 @@ static float servo5 = 0;
 
 RobotVisualisation::RobotVisualisation()
 {
+
 }
 
 void RobotVisualisation::initializeGL()
 {
     glClearColor (0.0, 0.0, 0.0, 0.0);
     glShadeModel (GL_FLAT);
+//    glEnable(GL_DEPTH_TEST);   // Enable depth testing for z-culling
+//    glDepthFunc(GL_LEQUAL);    // Set the type of depth-test
+//    glShadeModel(GL_SMOOTH);   // Enable smooth shading
+//    glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);  // Nice perspective corrections
+
 }
 
 void RobotVisualisation::resizeGL(GLint w, GLint h)
@@ -48,6 +54,8 @@ void RobotVisualisation::resizeGL(GLint w, GLint h)
 void RobotVisualisation::paintGL()
 {
     GLfloat length = 0.4;
+
+    glColor4ub(0,255,0,255);
     glClear (GL_COLOR_BUFFER_BIT);
     glPushMatrix();
     glTranslatef (-length, 0.0, 0.0);
@@ -79,6 +87,14 @@ void RobotVisualisation::paintGL()
     glPopMatrix();
 
     glPopMatrix();
+}
+
+void RobotVisualisation::mousePressEvent(QMouseEvent *event)
+{
+}
+
+void RobotVisualisation::mouseMoveEvent(QMouseEvent *event)
+{
 }
 
 

@@ -5,18 +5,21 @@
 
 #include <QObject>
 #include <QThread>
+#include <QMutex>
 
 class QWiiMote : public QObject
 {
     Q_OBJECT
 public:
     explicit QWiiMote(QObject *parent = 0);
+    bool m_exit;
 
 private:    
     CWiimote *m_wiiMote;
     void HandleEvent();
     void HandleStatus();
-    bool m_exit;
+
+    QMutex m_mutex;
 
 signals:
     // Wii Mote

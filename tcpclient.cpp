@@ -132,19 +132,17 @@ void TcpClient::readGumbaData(QString gumbaString)
         }
         if((gumbaString.at(0) == '{') && (gumbaString.at(1) == '"') && (gumbaString.at(2) == 'b')){
             if(sensors.value("bumper").toMap().value("left").toInt() == 0){
-                if(sensors.value("bumper").toMap().value("left").toInt() == 0){
-                    emit bumperLeftPressd(false);
-                    qDebug() << "Bumper Left OFF";
-                } if(sensors.value("bumper").toMap().value("left").toInt() == 1){
-                    emit bumperLeftPressd(true);
-                    qDebug() << "Bumper Left ON";
-                } if(sensors.value("bumper").toMap().value("right").toInt() == 0){
-                    emit bumperRightPressed(false);
-                    qDebug() << "Bumper Right OFF";
-                } if(sensors.value("bumper").toMap().value("right").toInt() == 1){
-                    emit bumperRightPressed(true);
-                    qDebug() << "Bumper Right ON";
-                }
+                emit bumperLeftPressd(false);
+                qDebug() << "Bumper Left OFF";
+            } if(sensors.value("bumper").toMap().value("left").toInt() == 1){
+                emit bumperLeftPressd(true);
+                qDebug() << "Bumper Left ON";
+            } if(sensors.value("bumper").toMap().value("right").toInt() == 0){
+                emit bumperRightPressed(false);
+                qDebug() << "Bumper Right OFF";
+            } if(sensors.value("bumper").toMap().value("right").toInt() == 1){
+                emit bumperRightPressed(true);
+                qDebug() << "Bumper Right ON";
             }
         }
     }

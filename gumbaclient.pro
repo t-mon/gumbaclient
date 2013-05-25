@@ -20,12 +20,14 @@ SOURCES += main.cpp\
     tcpclient.cpp \
     qwiimote.cpp \
     robotarm.cpp \
-    robotvisualisation.cpp
+    robotvisualisation.cpp \
+    gumbamovement.cpp
 
 HEADERS  += mainwindow.h \
     core.h \
     tcpclient.h \
     qwiimote.h \
     robotarm.h \
-    robotvisualisation.h
+    robotvisualisation.h \
+    gumbamovement.h
 

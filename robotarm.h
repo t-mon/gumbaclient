@@ -29,6 +29,10 @@ private:
 signals:
     void moveServo();
     void anglesUpdated();
+    void updateTcpPosition(const float &x, const float &y, const float &z);
+
+
+    void writeToTerminal(const QString &terminalString);
 
 private slots:
 

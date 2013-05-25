@@ -12,11 +12,17 @@ public:
     RobotVisualisation();
 
 private:
+    QPoint m_lastPos;
+    int m_xRot;
+    int m_yRot;
+    int m_zRot;
 
 protected:
     void initializeGL(void);
     void resizeGL( GLint w, GLint h );
     void paintGL();
+    void mousePressEvent(QMouseEvent *event);
+    void mouseMoveEvent(QMouseEvent *event);
     void wireCube(GLdouble length);
     void armRectangle();
     void wristRectangle(float length);

@@ -100,8 +100,8 @@ QWidget *MainWindow::createRobotWidget()
     QVBoxLayout *robotLayout = new QVBoxLayout();
     robotLayout->setSizeConstraint(QLayout::SetNoConstraint);
 
-    robotTabs->addTab(createGumbaGroupBox(),tr("Gumba Controll"));
     robotTabs->addTab(createRobotarmGroupBox(),tr("Robotarm Controll"));
+    robotTabs->addTab(createGumbaGroupBox(),tr("Gumba Controll"));
     robotTabs->addTab(createWiiMoteGroupBox(),tr("Wii Controll"));
 
     robotLayout->addWidget(robotTabs);
@@ -426,6 +426,7 @@ QGroupBox *MainWindow::createServoControllGroupBox()
     servoControllGrid->addWidget(servo3GroupBox,6,0);
     servoControllGrid->addWidget(servo4GroupBox,7,0);
     servoControllGrid->addWidget(servo5GroupBox,8,0);
+    servoControllGrid->addWidget(createServoPositionGroupBox(),3,1);
 
     connect(initServo,SIGNAL(clicked()),this,SLOT(initServoClicked()));
     connect(servoHomePositionButton,SIGNAL(clicked()),this,SLOT(servoHomePositionClicked()));
@@ -457,10 +458,28 @@ QGroupBox *MainWindow::createServoControllGroupBox()
 
 QGroupBox *MainWindow::createServoPositionGroupBox()
 {
-    QGroupBox *createServoPositionGroupBox = new QGroupBox(tr("Servo Position"),this);
+    QGroupBox *createServoPositionGroupBox = new QGroupBox(tr("TCP Position"),this);
     QVBoxLayout *servoPositionLayout = new QVBoxLayout;
     createServoPositionGroupBox->setLayout(servoPositionLayout);
 
+    tcp_x_Lable = new QLabel(this);
+    tcp_x_Lable->setFixedWidth(100);
+    tcp_x_Lable->setAlignment(Qt::AlignLeft);
+    tcp_x_Lable->setText("x = ");
+
+    tcp_y_Lable = new QLabel(this);
+    tcp_y_Lable->setFixedWidth(100);
+    tcp_y_Lable->setAlignment(Qt::AlignLeft);
+    tcp_y_Lable->setText("y = ");
+
+    tcp_z_Lable = new QLabel(this);
+    tcp_z_Lable->setFixedWidth(100);
+    tcp_z_Lable->setAlignment(Qt::AlignLeft);
+    tcp_z_Lable->setText("z = ");
+
+    servoPositionLayout->addWidget(tcp_x_Lable);
+    servoPositionLayout->addWidget(tcp_y_Lable);
+    servoPositionLayout->addWidget(tcp_z_Lable);
 
     return createServoPositionGroupBox;
 }
@@ -481,8 +500,8 @@ QGroupBox *MainWindow::createTerminalGroupBox()
     terminalView->setReadOnly(true);
     terminalView->setTextColor(QColor(0, 255, 0,255));
 
-    tabs->addTab(m_visualisation,tr("Robotarm"));
     tabs->addTab(terminalView,tr("Terminal"));
+    tabs->addTab(m_visualisation,tr("Robotarm"));
 
     terminalLayout->addWidget(tabs);
     terminalGroupBox->setLayout(terminalLayout);
@@ -725,6 +744,8 @@ void MainWindow::servo0SliderChanged(const int &pos)
     emit sendCommand("Servo0",QString::number(pos));
     m_angle0 = (pos);
     m_visualisation->updateservo0(convertPwmToDegreeBig(pos));
+    emit calculatePosition(convertPwmToDegreeBig(pos),convertPwmToDegreeBig(m_angle1),convertPwmToDegreeBig(m_angle2),convertPwmToDegreeBig(m_angle3),convertPwmToDegreeBig(m_angle4));
+
 }
 
 void MainWindow::servo0animationClicked()
@@ -746,6 +767,7 @@ void MainWindow::servo1SliderChanged(const int &pos)
     emit sendCommand("Servo1",QString::number(pos));
     m_angle1 = (pos);
     m_visualisation->updateservo1(convertPwmToDegreeBig(pos));
+    emit calculatePosition(convertPwmToDegreeBig(m_angle0),convertPwmToDegreeBig(pos),convertPwmToDegreeBig(m_angle2),convertPwmToDegreeBig(m_angle3),convertPwmToDegreeBig(m_angle4));
 
 }
 
@@ -768,6 +790,7 @@ void MainWindow::servo2SliderChanged(const int &pos)
     emit sendCommand("Servo2",QString::number(pos));
     m_angle2 = pos;
     m_visualisation->updateservo2(convertPwmToDegreeBig(pos));
+    emit calculatePosition(convertPwmToDegreeBig(m_angle0),convertPwmToDegreeBig(m_angle1),convertPwmToDegreeBig(pos),convertPwmToDegreeBig(m_angle4),convertPwmToDegreeBig(m_angle4));
 
 }
 
@@ -789,6 +812,7 @@ void MainWindow::servo3SliderChanged(const int &pos)
     emit sendCommand("Servo3",QString::number(pos));
     m_angle3 = (pos);
     m_visualisation->updateservo3(convertPwmToDegreeBig(pos));
+    emit calculatePosition(convertPwmToDegreeBig(m_angle0),convertPwmToDegreeBig(m_angle1),convertPwmToDegreeBig(m_angle2),convertPwmToDegreeBig(pos),convertPwmToDegreeBig(m_angle4));
 }
 
 void MainWindow::servo3animationClicked()
@@ -808,7 +832,7 @@ void MainWindow::servo4SliderChanged(const int &pos)
     servo4Label->setText("S4 = " + QString::number(convertPwmToDegreeSmall(pos)));
     emit sendCommand("Servo4",QString::number(pos));
     m_angle4 = (pos);
-    m_visualisation->updateservo4(convertPwmToDegreeSmall(pos));
+    emit calculatePosition(convertPwmToDegreeBig(m_angle0),convertPwmToDegreeBig(m_angle1),convertPwmToDegreeBig(m_angle2),convertPwmToDegreeBig(m_angle3),convertPwmToDegreeBig(pos));
 }
 
 void MainWindow::servo4animationClicked()
@@ -870,7 +894,7 @@ void MainWindow::moveServo(const int &servoNumber, const int &start, const int &
     //InOutCubic
     //InOutQuint
 
-    QEasingCurve movementCurve = QEasingCurve::InOutExpo;
+    QEasingCurve movementCurve = QEasingCurve::InOutQuint;
 
     switch(servoNumber){
     case 0:
@@ -1098,6 +1122,14 @@ void MainWindow::batteryStatus(double battery)
 void MainWindow::wiiMoteABChanged(const bool &pressedState)
 {
     m_wiiMoteABstate = pressedState;
+}
+
+void MainWindow::tcpPositionChanged(const float &x, const float &y, const float &z)
+{
+    tcp_x_Lable->setText("x = " + QString::number(x));
+    tcp_y_Lable->setText("y = " + QString::number(y));
+    tcp_z_Lable->setText("z = " + QString::number(z));
+
 }
 
 

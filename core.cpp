@@ -11,7 +11,9 @@ Core::Core(QObject *parent) :
     m_client = new TcpClient(this);
 
     m_arm = new RobotArm(this);
-    m_arm->updateAngles(0,0,0,0,0);
+    m_gumbaMove = new GumbaMovement(this);
+
+    connect(this,SIGNAL(writeToTerminal(QString)),m_mainwindow,SLOT(writeToTerminal(QString)));
 
     connect(m_mainwindow,SIGNAL(connectServer(QString,QString)),m_client,SLOT(connectToHost(QString,QString)));
     connect(m_mainwindow,SIGNAL(disconnectServer()),m_client,SLOT(disconnectFromHost()));
@@ -32,6 +34,13 @@ Core::Core(QObject *parent) :
     connect(m_mainwindow,SIGNAL(stopWiiMote()),this,SLOT(stopWiiProcess()));
     connect(m_mainwindow,SIGNAL(startWiiMote()),this,SLOT(startWiiProcess()));
     connect(m_wiiMoteThread,SIGNAL(finished()),this,SLOT(wiiProcessFinished()));
+
+    connect(m_arm,SIGNAL(writeToTerminal(QString)),m_mainwindow,SLOT(writeToTerminal(QString)));
+    connect(m_arm,SIGNAL(updateTcpPosition(float,float,float)),m_mainwindow,SLOT(tcpPositionChanged(float,float,float)));
+    connect(m_mainwindow,SIGNAL(calculatePosition(float,float,float,float,float)),m_arm,SLOT(updateAngles(float,float,float,float,float)));
+
+    connect(m_gumbaMove,SIGNAL(writeToTerminal(QString)),m_mainwindow,SLOT(writeToTerminal(QString)));
+    connect(m_gumbaMove,SIGNAL(sendCommand(QString,QString)),m_client,SLOT(sendData(QString,QString)));
 }
 
 float Core::degreeToRadiant(float degree)
@@ -41,12 +50,16 @@ float Core::degreeToRadiant(float degree)
 
 void Core::startWiiProcess()
 {
-    QWiiMote *m_wiimote = new QWiiMote();
+    if(m_wiiMoteThread->isRunning()){
+        qDebug() << "Wii process is allready running...";
+        return;
+    }
+    m_wiimote = new QWiiMote();
     m_wiimote->moveToThread(m_wiiMoteThread);
     m_wiiMoteThread->start();
 
     connect(m_wiiMoteThread,SIGNAL(started()),m_wiimote,SLOT(startWiiMotesLoop()));
-    connect(m_wiimote,SIGNAL(stopProcess()),this,SLOT(stopWiiProcess()));
+    connect(m_wiimote,SIGNAL(stopProcess()),this,SLOT(wiiLoopFinised()));
 
     connect(m_wiimote,SIGNAL(writeToTerminal(QString)),m_mainwindow,SLOT(writeToTerminal(QString)));
     connect(m_wiimote,SIGNAL(orientationWiiMoteChanged(float,float,float)),m_mainwindow,SLOT(updateWiiMoteOrientation(float,float,float)));
@@ -60,6 +73,8 @@ void Core::startWiiProcess()
     connect(m_wiimote,SIGNAL(guitarHeroWhammyBarChanged(float)),m_mainwindow,SLOT(updateGuitarHeroWhaaData(float)));
     connect(m_wiimote,SIGNAL(wiiBatteryChanged(float)),m_mainwindow,SLOT(updateWiiBattery(float)));
 
+    connect(m_wiimote,SIGNAL(nunchukJoystickChanged(float,float)),m_gumbaMove,SLOT(parseJoystick(float,float)));
+
 
     connect(m_wiimote,SIGNAL(button_AB_pressed(bool)),m_mainwindow,SLOT(wiiMoteABChanged(bool)));
 
@@ -67,11 +82,22 @@ void Core::startWiiProcess()
 
 void Core::stopWiiProcess()
 {
+    m_mutex.lock();
+    m_wiimote->m_exit = true;
+    m_mutex.unlock();
+}
+
+void Core::wiiLoopFinised()
+{   
+    m_mutex.lock();
+    m_wiimote->m_exit = true;
+    m_mutex.unlock();
+
     if(m_wiiMoteThread->isRunning()){
-        qDebug() << "Wii process is running...";
         m_wiiMoteThread->quit();
         m_wiiMoteThread->terminate();
         m_wiiMoteThread->exit();
+        m_wiimote->~QObject();
     }else{
         qDebug() << "Wii process is not running...";
     }
@@ -80,5 +106,6 @@ void Core::stopWiiProcess()
 void Core::wiiProcessFinished()
 {
     qDebug() << "Wii process killed...";
+    writeToTerminal("Wii process killed...");
 }
 

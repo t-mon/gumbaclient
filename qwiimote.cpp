@@ -267,28 +267,34 @@ void QWiiMote::HandleStatus()
 
 void QWiiMote::startWiiMotesLoop()
 {
-    m_exit = false;
+    m_mutex.lock();
+    m_exit=false;
+    m_mutex.unlock();
     qDebug() << "Start wii loop";
     CWii wii;
     std::vector<CWiimote>::iterator i;
     int reloadWiimotes = 0;
-
-    emit writeToTerminal("searching for WiiMotes...");
+    writeToTerminal("Wii process started...");
+    emit writeToTerminal("...searching for WiiMotes...");
 
     // Find and connect to the wiimotes
     std::vector<CWiimote>& wiimotes = wii.FindAndConnect();
 
     if (!wiimotes.size()) {
-        emit writeToTerminal("no wii remote found!");
+        emit writeToTerminal("...no WiiMote found!");
         emit stopProcess();
-        m_exit = true;
+        m_mutex.lock();
+        m_exit=true;
+        m_mutex.unlock();
         return;
     }
 
     if(wiimotes.size() != 1){
-        emit writeToTerminal("please add just one Wii Remote");
+        emit writeToTerminal("please add just one WiiMote");
         emit stopProcess();
-        m_exit = true;
+        m_mutex.lock();
+        m_exit=true;
+        m_mutex.unlock();
         return;
     }
     emit writeToTerminal("...WiiMote connected!");
@@ -316,8 +322,7 @@ void QWiiMote::startWiiMotesLoop()
         }
 
         //Poll the wiimotes to get the status like pitch or roll
-        if(wii.Poll())
-        {
+        if(wii.Poll()){
             switch(m_wiiMote->GetEvent()){
 
             case CWiimote::EVENT_EVENT:
@@ -330,13 +335,17 @@ void QWiiMote::startWiiMotesLoop()
 
             case CWiimote::EVENT_DISCONNECT:
                 emit writeToTerminal("Wii: Wii mote disconnected!");
+                m_mutex.lock();
                 m_exit=true;
+                m_mutex.unlock();
                 emit stopProcess();
                 break;
 
             case CWiimote::EVENT_UNEXPECTED_DISCONNECT:
                 emit writeToTerminal("Wii: Wii mote disconnected!");
+                m_mutex.lock();
                 m_exit=true;
+                m_mutex.unlock();
                 emit stopProcess();
                 break;
 
@@ -380,7 +389,17 @@ void QWiiMote::startWiiMotesLoop()
                 break;
             }
         }
-    }while(wiimotes.size() || !m_exit); // Go so long as there are wiimotes left to poll
+
+        m_mutex.lock();
+        if(m_exit){
+            m_mutex.unlock();
+            qDebug() << "exit wii loop";
+            break;
+        }
+        m_mutex.unlock();
+
+    }while(wiimotes.size()); // Go so long as there are wiimotes left to poll
+
     qDebug() << "wii loop finished";
     emit stopProcess();
 
@@ -390,7 +409,9 @@ void QWiiMote::startWiiMotesLoop()
 
 void QWiiMote::disconnectWiiMote()
 {
-    m_exit = true;
+    m_mutex.lock();
+    m_exit=true;
+    m_mutex.unlock();
     m_wiiMote->Disconnect();
     emit stopProcess();
     writeToTerminal("WiiMote disconnect");

@@ -21,7 +21,7 @@
 #define downLimitBig 57
 #define upLimitSmall 227
 #define downLimitSmall 50
-#define periodMove 2000
+#define periodMove 3000
 
 namespace Ui {
 class MainWindow;
@@ -57,6 +57,13 @@ private:
     float m_angle3;
     float m_angle4;
     float m_angle5;
+
+    QLabel *tcp_x_Lable;
+    QLabel *tcp_y_Lable;
+    QLabel *tcp_z_Lable;
+    QLabel *tcp_roll_Lable;
+    QLabel *tcp_pitch_Lable;
+    QLabel *tcp_yaw_Lable;
 
 
     float convertPwmToDegreeBig(int pwm);
@@ -181,6 +188,8 @@ signals:
     void stopWiiMote();
 
     void disconnectServer();
+    void calculatePosition(float theta1, float theta2, float theta3, float theta4, float theta5);
+
 
 public slots:
     void writeToTerminal(const QString &terminalString);
@@ -197,6 +206,8 @@ public slots:
     void batteryStatus(double battery);
 
     void wiiMoteABChanged(const bool &pressedState);
+
+    void tcpPositionChanged(const float &x, const float &y, const float &z);
 
     void moveServo(const int &servoNumber, const int &start, const int &end, const int &period);
     void allSevosPwmOff();
