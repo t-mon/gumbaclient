@@ -115,6 +115,14 @@ void TcpClient::readGumbaData(QString gumbaString)
             }
         }
 
+        if((gumbaString.at(0) == '{') && (gumbaString.at(1) == '"') && (gumbaString.at(2) == 's')){
+            double speedL = sensors.value("speed").toMap().value("left").toDouble();
+            double speedR = sensors.value("speed").toMap().value("right").toDouble();
+
+            emit speedLeft(speedL);
+            emit speedRight(speedR);
+        }
+
         if((gumbaString.at(0) == '{') && (gumbaString.at(1) == '"') && (gumbaString.at(2) == 'o')){
             if(sensors.value("obstacles").toMap().value("left").toInt() == 0){
                 emit obstacleLeft(false);

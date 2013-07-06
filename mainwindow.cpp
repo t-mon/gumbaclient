@@ -40,6 +40,9 @@ MainWindow::MainWindow(QWidget *parent) :
     mainGridLayout->addWidget(createTerminalGroupBox(),1,0);
     mainGridLayout->addWidget(createRobotWidget(),0,1,2,1);
 
+    connect(this,SIGNAL(zoomIn()),m_visualisation,SLOT(zoomIn()));
+    connect(this,SIGNAL(zoomOut()),m_visualisation,SLOT(zoomOut()));
+
 
 }
 
@@ -65,6 +68,12 @@ void MainWindow::keyPressEvent( QKeyEvent *event){
         break;
     case Qt::Key_X:
         emit sendCommand("RoboterMovement","stop");
+        break;
+    case Qt::Key_Plus:
+        emit zoomIn();
+        break;
+    case Qt::Key_Minus:
+        emit zoomOut();
         break;
     }
 }
@@ -95,7 +104,7 @@ QWidget *MainWindow::createRobotarmGroupBox()
 
 QWidget *MainWindow::createRobotWidget()
 {
-    QWidget *robotWidget = new QWidget();
+    QWidget *robotWidget = new QWidget(this);
     QTabWidget *robotTabs = new QTabWidget(this);
     QVBoxLayout *robotLayout = new QVBoxLayout();
     robotLayout->setSizeConstraint(QLayout::SetNoConstraint);
@@ -171,6 +180,12 @@ QGroupBox *MainWindow::createGumbaSensorDataGroupBox()
     motorRightLabel->setText("Motor R: 0");
     motorRightLabel->setFixedWidth(150);
 
+    speedLeftLabel = new QLabel(this);
+    speedLeftLabel->setText("Speed L: 0");
+
+    speedRightLabel = new QLabel(this);
+    speedRightLabel->setText("Speed R: 0");
+
     lightLeftLabel = new QLabel(this);
     lightLeftLabel->setText("Light L: 0");
 
@@ -184,31 +199,20 @@ QGroupBox *MainWindow::createGumbaSensorDataGroupBox()
     gumbaBatteryBar->setMaximum(880);
     gumbaBatteryBar->setOrientation(Qt::Horizontal);
 
-    velocitySlider = new QSlider(Qt::Horizontal, this);
-    velocitySlider->setTickInterval(1);
-    velocitySlider->setFixedWidth(150);
-    velocitySlider->setMinimum(1);
-    velocitySlider->setMaximum(4);
-
-    velocityLabel = new QLabel(this);
-    velocityLabel->setAlignment(Qt::AlignCenter);
-    velocityLabel->setText("v=0");
-
     gumbaSensorDataGrid->addWidget(bumperLeftLabel,0,0);
     gumbaSensorDataGrid->addWidget(bumperRightLabel,0,1);
     gumbaSensorDataGrid->addWidget(obstacleLeftLabel,1,0);
     gumbaSensorDataGrid->addWidget(obstacleRightLabel,1,1);
     gumbaSensorDataGrid->addWidget(motorLeftLabel,2,0);
     gumbaSensorDataGrid->addWidget(motorRightLabel,2,1);
-    gumbaSensorDataGrid->addWidget(lightLeftLabel,3,0);
-    gumbaSensorDataGrid->addWidget(lightRightLabel,3,1);
-    gumbaSensorDataGrid->addWidget(gumbaBatteryBar,4,0);
-    gumbaSensorDataGrid->addWidget(velocitySlider,5,0);
-    gumbaSensorDataGrid->addWidget(velocityLabel,5,1);
+    gumbaSensorDataGrid->addWidget(speedLeftLabel,3,0);
+    gumbaSensorDataGrid->addWidget(speedRightLabel,3,1);
+    gumbaSensorDataGrid->addWidget(lightLeftLabel,4,0);
+    gumbaSensorDataGrid->addWidget(lightRightLabel,4,1);
+    gumbaSensorDataGrid->addWidget(gumbaBatteryBar,5,0);
+
 
     gumbaSensorDataGroupBox->setLayout(gumbaSensorDataGrid);
-
-    connect(velocitySlider,SIGNAL(sliderMoved(int)),this,SLOT(velocitySliderChanged(int)));
 
     return gumbaSensorDataGroupBox;
 }
@@ -500,8 +504,8 @@ QGroupBox *MainWindow::createTerminalGroupBox()
     terminalView->setReadOnly(true);
     terminalView->setTextColor(QColor(0, 255, 0,255));
 
-    tabs->addTab(terminalView,tr("Terminal"));
     tabs->addTab(m_visualisation,tr("Robotarm"));
+    tabs->addTab(terminalView,tr("Terminal"));
 
     terminalLayout->addWidget(tabs);
     terminalGroupBox->setLayout(terminalLayout);
@@ -711,32 +715,6 @@ void MainWindow::toggleRTSClicked()
     writeToTerminal("toggle RTS");
 }
 
-void MainWindow::velocitySliderChanged(int pos)
-{
-    switch(pos){
-
-    case 1:
-        emit sendCommand("RoboterSpeed","1");
-        writeToTerminal("speedlevel: 1");
-        velocityLabel->setText("v = low");
-        break;
-    case 2:
-        emit sendCommand("RoboterSpeed","2");
-        writeToTerminal("speedlevel: 2");
-        velocityLabel->setText("v = med");
-        break;
-    case 3:
-        emit sendCommand("RoboterSpeed","3");
-        writeToTerminal("speedlevel: 3");
-        velocityLabel->setText("v = high");
-        break;
-    case 4:
-        emit sendCommand("RoboterSpeed","4");
-        writeToTerminal("speedlevel: MAX");
-        velocityLabel->setText("v = max");
-        break;
-    }
-}
 
 void MainWindow::servo0SliderChanged(const int &pos)
 {
@@ -832,6 +810,7 @@ void MainWindow::servo4SliderChanged(const int &pos)
     servo4Label->setText("S4 = " + QString::number(convertPwmToDegreeSmall(pos)));
     emit sendCommand("Servo4",QString::number(pos));
     m_angle4 = (pos);
+    m_visualisation->updateservo4(convertPwmToDegreeBig(pos));
     emit calculatePosition(convertPwmToDegreeBig(m_angle0),convertPwmToDegreeBig(m_angle1),convertPwmToDegreeBig(m_angle2),convertPwmToDegreeBig(m_angle3),convertPwmToDegreeBig(pos));
 }
 
@@ -1102,6 +1081,16 @@ void MainWindow::motorLeft(int motorCurrent)
 void MainWindow::motorRight(int motorCurrent)
 {
     motorRightLabel->setText("Motor R: " + QString::number(motorCurrent));
+}
+
+void MainWindow::speedLeft(double speedL)
+{
+    speedLeftLabel->setText("Speed L: " + QString::number(speedL));
+}
+
+void MainWindow::speedRight(double speedR)
+{
+    speedRightLabel->setText("Speed R: " + QString::number(speedR));
 }
 
 void MainWindow::lightLeft(int lightIntensity)

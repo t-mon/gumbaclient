@@ -80,8 +80,6 @@ private:
     QPropertyAnimation *animationServo5;
 
     QTextEdit *terminalView;
-    QSlider *velocitySlider;
-    QLabel *velocityLabel;
 
     QSlider *servo0Slider;
     QLabel *servo0Label;
@@ -107,6 +105,8 @@ private:
     QLabel *obstacleRightLabel;
     QLabel *motorLeftLabel;
     QLabel *motorRightLabel;
+    QLabel *speedLeftLabel;
+    QLabel *speedRightLabel;
     QLabel *lightLeftLabel;
     QLabel *lightRightLabel;
 
@@ -138,8 +138,6 @@ private slots:
     void disconnectGumbaClicked();
     void startGumbaApplicationClicked();
     void toggleRTSClicked();
-
-    void velocitySliderChanged(int pos);
 
     void servo0SliderChanged(const int &pos);
     void servo0animationClicked();
@@ -190,6 +188,8 @@ signals:
     void disconnectServer();
     void calculatePosition(float theta1, float theta2, float theta3, float theta4, float theta5);
 
+    void zoomIn();
+    void zoomOut();
 
 public slots:
     void writeToTerminal(const QString &terminalString);
@@ -201,6 +201,8 @@ public slots:
 
     void motorLeft(int motorCurrent);
     void motorRight(int motorCurrent);
+    void speedLeft(double speedL);
+    void speedRight(double speedR);
     void lightLeft(int lightIntensity);
     void lightRight(int lightIntensity);
     void batteryStatus(double battery);

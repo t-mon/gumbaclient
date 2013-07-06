@@ -56,13 +56,13 @@ void GumbaMovement::parseJoystick(const float &angle, const float &magnitude)
                     if(leftRight < 0){
                         speedLeft = speed - abs(speed*leftRight/100);
                         speedRight = speed;
-                        gumbaMovementCommand = "b:" + QString::number(speedLeft) + ";" + QString::number(speedRight) ;
+                        gumbaMovementCommand = "b:" + QString::number(speedLeft) + ";" + QString::number(speedRight);
                     }
                     // RIGHT CURVE ######################
                     if(leftRight > 0){
                         speedLeft = speed;
                         speedRight = speed - abs(speed*leftRight/100);;
-                        gumbaMovementCommand = "b:" + QString::number(speedLeft) + ";" + QString::number(speedRight) ;
+                        gumbaMovementCommand = "b:" + QString::number(speedLeft) + ";" + QString::number(speedRight);
                     }
                 }
                 // MOVE CURVE FORWARDS ######################
@@ -71,36 +71,39 @@ void GumbaMovement::parseJoystick(const float &angle, const float &magnitude)
                     if(leftRight < 0){
                         speedLeft = speed - abs(speed*leftRight/100);
                         speedRight = speed;
-                        gumbaMovementCommand = "f:" + QString::number(speedLeft) + ";" + QString::number(speedRight) ;
+                        gumbaMovementCommand = "f:" + QString::number(speedLeft) + ";" + QString::number(speedRight);
                     }
                     // RIGHT CURVE ######################
                     if(leftRight > 0){
                         speedLeft = speed;
                         speedRight = speed - abs(speed*leftRight/100);;
-                        gumbaMovementCommand = "f:" + QString::number(speedLeft) + ";" + QString::number(speedRight) ;
+                        gumbaMovementCommand = "f:" + QString::number(speedLeft) + ";" + QString::number(speedRight);
                     }
                 }
             }
         }
 
         if(((angle >= 270) || (angle <= 90)) && (m_state != FWD)){
-            //writeToTerminal("Robotmovement FWD");
+            writeToTerminal("Robotmovement FWD");
             m_state = FWD;
         }
         if((angle < 270) && (angle > 90) && (m_state != BWD)){
-            //writeToTerminal("Robotmovement BWD");
+            writeToTerminal("Robotmovement BWD");
             m_state = BWD;
         }
 
-        //qDebug() << gumbaMovementCommand;
-        emit sendCommand("RoboterMovement",gumbaMovementCommand);
+        if(upDown%5 == 0){
+            qDebug() << gumbaMovementCommand;
+            emit sendCommand("RoboterMovement",gumbaMovementCommand + '\n');
+        }
 
     }else{
         if(m_state != STOP){
-            //writeToTerminal("Robotmovement STOP");
-            gumbaMovementCommand = "s\n";
-            //qDebug() << gumbaMovementCommand;
-            emit sendCommand("RoboterMovement",gumbaMovementCommand);
+            writeToTerminal("Robotmovement STOP");
+            gumbaMovementCommand = "s";
+            qDebug() << gumbaMovementCommand;
+            emit sendCommand("RoboterMovement",gumbaMovementCommand + '\n');
+            emit sendCommand("RoboterMovement",gumbaMovementCommand + '\n');
             m_state = STOP;
         }
     }

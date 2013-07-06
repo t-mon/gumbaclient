@@ -8,6 +8,7 @@ Core::Core(QObject *parent) :
     m_mainwindow->show();
 
     m_wiiMoteThread = new QThread(this);
+
     m_client = new TcpClient(this);
 
     m_arm = new RobotArm(this);
@@ -27,6 +28,8 @@ Core::Core(QObject *parent) :
     connect(m_client,SIGNAL(obstacleRight(bool)),m_mainwindow,SLOT(obstacleRight(bool)));
     connect(m_client,SIGNAL(motorLeft(int)),m_mainwindow,SLOT(motorLeft(int)));
     connect(m_client,SIGNAL(motorRight(int)),m_mainwindow,SLOT(motorRight(int)));
+    connect(m_client,SIGNAL(speedLeft(double)),m_mainwindow,SLOT(speedLeft(double)));
+    connect(m_client,SIGNAL(speedRight(double)),m_mainwindow,SLOT(speedRight(double)));
     connect(m_client,SIGNAL(lightLeft(int)),m_mainwindow,SLOT(lightLeft(int)));
     connect(m_client,SIGNAL(lightRight(int)),m_mainwindow,SLOT(lightRight(int)));
     connect(m_client,SIGNAL(batteryVoltage(double)),m_mainwindow,SLOT(batteryStatus(double)));
@@ -41,6 +44,9 @@ Core::Core(QObject *parent) :
 
     connect(m_gumbaMove,SIGNAL(writeToTerminal(QString)),m_mainwindow,SLOT(writeToTerminal(QString)));
     connect(m_gumbaMove,SIGNAL(sendCommand(QString,QString)),m_client,SLOT(sendData(QString,QString)));
+
+    //startWiiProcess();
+
 }
 
 float Core::degreeToRadiant(float degree)
@@ -82,9 +88,11 @@ void Core::startWiiProcess()
 
 void Core::stopWiiProcess()
 {
-    m_mutex.lock();
-    m_wiimote->m_exit = true;
-    m_mutex.unlock();
+    if(m_wiiMoteThread->isRunning()){
+        m_mutex.lock();
+        m_wiimote->m_exit = true;
+        m_mutex.unlock();
+    }
 }
 
 void Core::wiiLoopFinised()
@@ -107,5 +115,7 @@ void Core::wiiProcessFinished()
 {
     qDebug() << "Wii process killed...";
     writeToTerminal("Wii process killed...");
+    // relunch the wii process
+    //startWiiProcess();
 }
 

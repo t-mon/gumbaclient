@@ -1,6 +1,9 @@
-#include <GL/glu.h>
+#include <QtGui>
+#include <QtOpenGL>
+#include <QMatrix4x4>
+#include <QVector3D>
+#include <qmath.h>
 #include <GL/glut.h>
-#include <QDebug>
 #include "robotvisualisation.h"
 
 
@@ -23,110 +26,214 @@ static float servo3 = -90;
 static float servo4 = 0;
 static float servo5 = 0;
 
-RobotVisualisation::RobotVisualisation()
+RobotVisualisation::RobotVisualisation(QWidget *parent)
+    : QGLWidget(QGLFormat(QGL::SampleBuffers),parent)
 {
-
+    // Scale
+    m_l=6;
 }
 
 void RobotVisualisation::initializeGL()
 {
-    glClearColor (0.0, 0.0, 0.0, 0.0);
-    glShadeModel (GL_FLAT);
-//    glEnable(GL_DEPTH_TEST);   // Enable depth testing for z-culling
-//    glDepthFunc(GL_LEQUAL);    // Set the type of depth-test
-//    glShadeModel(GL_SMOOTH);   // Enable smooth shading
-//    glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);  // Nice perspective corrections
-
 }
 
-void RobotVisualisation::resizeGL(GLint w, GLint h)
+void RobotVisualisation::resizeGL(GLint width, GLint height)
 {
-    glViewport (0, 0, (GLsizei) w, (GLsizei) h);
-    glMatrixMode (GL_PROJECTION);
-    glLoadIdentity ();
-    gluPerspective(65.0, (GLfloat) w/(GLfloat) h, 1.0, 20.0);
-    glMatrixMode(GL_MODELVIEW);
+    glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    glTranslatef (0.0, 0.0, -5.0);
+    gluPerspective(40.0,(GLdouble)width/(GLdouble)height,0.5,20.0);
+    glMatrixMode(GL_MODELVIEW);
+    glViewport(0,0,width,height);
 
 }
 
 void RobotVisualisation::paintGL()
 {
-    GLfloat length = 0.4;
+    glMatrixMode(GL_MODELVIEW);
+    glClear(GL_COLOR_BUFFER_BIT);
+    glLoadIdentity();
 
-    glColor4ub(0,255,0,255);
-    glClear (GL_COLOR_BUFFER_BIT);
+    glTranslatef(0.0,0.0,-10.5);
+    glRotatef(xRot / 16.0, 1.0, 0.0, 0.0);
+    glRotatef(yRot / 16.0, 0.0, 1.0, 0.0);
+    glRotatef(zRot / 16.0, 0.0, 0.0, 1.0);
+
+    //Base
+    drawGrid();
+    drawKoordinateSystem();
+
+    //First joint (servo0)
     glPushMatrix();
-    glTranslatef (-length, 0.0, 0.0);
-    glRotatef ((GLfloat) servo1, 0.0, 0.0, 1.0);
-    glTranslatef (length, 0.0, 0.0);
+    glRotatef((GLfloat) servo0,0,0,1);
+    drawKoordinateSystem();
+    //L1
+    drawCylinder(m_l/30,m_l/10);
     glPushMatrix();
-    glScalef (2.0, 0.4, 1.0);
-    wireCube(length);
+    glTranslatef (0,0,m_l/10);
 
-    glPopMatrix();
+    //Second Joint (servo1)
+    glTranslatef (0,0,m_l/30);
+    glColor3f(0.8,0.8,0.8);
+    glutSolidSphere(m_l/30,32,32);
 
-    glTranslatef (length, 0.0, 0.0);
-    glRotatef ((GLfloat) servo2, 0.0, 0.0, 1.0);
-    glTranslatef (length, 0.0, 0.0);
     glPushMatrix();
-    glScalef (2.0, 0.4, 1.0);
-    wireCube(length);
+    glRotatef(90,1,0,0);
+    glRotatef((GLfloat) servo1,0,0,1);
+    drawKoordinateSystem();
 
-    glPopMatrix();
-
-    glTranslatef (length, 0.0, 0.0);
-    glRotatef ((GLfloat) servo3+90, 0.0, 0.0, 1.0);
-    glTranslatef (length/2, 0.0, 0.0);
+    //L2
     glPushMatrix();
-    glScalef (1.0, 0.4, 1.0);
-    wireCube(length);
-    glPopMatrix();
+    glRotatef(90,0,1,0);
+    glTranslatef (0,0,m_l/30);
+    drawCylinder(m_l/30,m_l/5);
+
+    //Third joint (servo2)
+    glTranslatef (0,0,m_l/5+m_l/30);
+    glRotatef(-90,0,1,0);
+    glPushMatrix();
+    glColor3f(0.8,0.8,0.8);
+    glutSolidSphere(m_l/30,32,32);
+    glRotatef((GLfloat) servo2,0,0,1);
+    drawKoordinateSystem();
+
+    //L3
+    glPushMatrix();
+    glRotatef(90,0,1,0);
+    glTranslatef (0,0,m_l/30);
+    drawCylinder(m_l/30,m_l/5);
+
+    //Fourth joint (servo3)
+    glTranslatef (0,0,m_l/5+m_l/30);
+    glRotatef(-90,0,1,0);
+    glPushMatrix();
+    glColor3f(0.8,0.8,0.8);
+    glutSolidSphere(m_l/30,32,32);
+    glRotatef((GLfloat) servo3+90,0,0,1);
+    drawKoordinateSystem();
+
+    //L4
+    glRotatef(90,0,1,0);
+    glTranslatef (0,0,m_l/30);
+    glPushMatrix();
+    drawCylinder(m_l/30,m_l/15);
+
+    //Fith joint (servo4)
+    glTranslatef (0,0,m_l/30+m_l/15);
+    glPushMatrix();
+    glRotatef((GLfloat)servo4,0,0,1);
+    drawKoordinateSystem();
+
 
     glPopMatrix();
-
     glPopMatrix();
+    glPopMatrix();
+    glPopMatrix();
+    glPopMatrix();
+    glPopMatrix();
+    glPopMatrix();
+    glPopMatrix();
+    glPopMatrix();
+
 }
 
 void RobotVisualisation::mousePressEvent(QMouseEvent *event)
 {
+    lastPos = event->pos();
 }
 
 void RobotVisualisation::mouseMoveEvent(QMouseEvent *event)
 {
+    int dx = event->x() - lastPos.x();
+    int dy = event->y() - lastPos.y();
+
+    if (event->buttons() & Qt::LeftButton) {
+        setXRotation(xRot + 10 * dy);
+        setYRotation(yRot + 10 * dx);
+    } else if (event->buttons() & Qt::RightButton) {
+        setXRotation(xRot + 10 * dy);
+        setZRotation(zRot + 10 * dx);
+    }
+    lastPos = event->pos();
 }
 
 
-void RobotVisualisation::wireCube(GLdouble length)
+void RobotVisualisation::drawGrid()
 {
-    glBegin(GL_LINE_LOOP);
-    glVertex3f(-length/2, -length/2, length/2);
-    glVertex3f(length/2, -length/2, length/2);
-    glVertex3f(length/2, length/2, length/2);
-    glVertex3f(-length/2, length/2, length/2);
+    float n=10;
+    float dxy=m_l/n;
+
+    glColor3f(0.1,0.2,0.1);
+    glBegin(GL_QUADS);
+    glVertex3f( m_l/2,m_l/2, 0);
+    glVertex3f( m_l/2,-m_l/2,0);
+    glVertex3f( -m_l/2,-m_l/2,0);
+    glVertex3f( -m_l/2,m_l/2,0);
     glEnd();
 
-}
-
-void RobotVisualisation::armRectangle()
-{
-
-
-
-}
-
-void RobotVisualisation::wristRectangle(float length)
-{
-
-    glBegin(GL_LINE_LOOP);
-    glVertex3f(-length/2, -length/2, length/2);
-    glVertex3f(length/2, -length/2, length/2);
-    glVertex3f(length/2, length/2, length/2);
-    glVertex3f(-length/2, length/2, length/2);
+    glBegin(GL_LINES);
+    for(int i=0;i<=n;i++){
+        glColor3f(0,1,0);
+        glVertex3f(-m_l/2,m_l/2-(i*dxy),0);
+        glVertex3f(m_l/2,m_l/2-(i*dxy),0);
+        glVertex3f(-m_l/2+(i*dxy),m_l/2,0);
+        glVertex3f(-m_l/2+(i*dxy),-m_l/2,0);
+    }
     glEnd();
 
+    glBegin(GL_LINES);
+    // x
+    glColor3f(1,0,0);
+    glVertex3f(0,0,0);
+    glVertex3f(m_l*0.7,0,0);
+    // y
+    glColor3f(1,0,1);
+    glVertex3f(0,0,0);
+    glVertex3f(0,m_l*0.7,0);
+    // z
+    //    glColor3f(0,0,0);
+    //    glVertex3f(0,0,0);
+    //    glVertex3f(0,0,m_l*0.7);
+    glEnd();
 }
+
+void RobotVisualisation::drawKoordinateSystem()
+{
+    glBegin(GL_LINES);
+    // x
+    glColor3f(1,0,0);
+    glVertex3f(0,0,0);
+    glVertex3f(m_l/12,0,0);
+    // y
+    glColor3f(1,0,1);
+    glVertex3f(0,0,0);
+    glVertex3f(0,m_l/12,0);
+    // z
+    glColor3f(0,0,1);
+    glVertex3f(0,0,0);
+    glVertex3f(0,0,m_l/12);
+    glEnd();
+}
+
+void RobotVisualisation::drawCylinder(float radius, float height)
+{
+    glColor3f(0.5,0.5,0.5);
+
+    int slices = 32;
+
+    GLUquadricObj *quadratic;
+    quadratic = gluNewQuadric();
+    gluQuadricDrawStyle(quadratic, GLU_POINT);
+    gluCylinder(quadratic,radius,radius,height,slices,slices);
+    gluQuadricDrawStyle(quadratic, GL_FILL);
+    gluDisk(quadratic,0,radius,slices,slices);
+    glPushMatrix();
+    glTranslatef(0,0,height);
+    gluQuadricDrawStyle(quadratic, GL_FILL);
+    gluDisk(quadratic,0,radius,slices,slices);
+    glPopMatrix();
+}
+
+
 
 void RobotVisualisation::updateservo0(int degree)
 {
@@ -162,4 +269,54 @@ void RobotVisualisation::updateservo5(int degree)
 {
     servo5 = degree % 360;
     updateGL();
+}
+
+void RobotVisualisation::zoomIn()
+{
+    m_l+=0.2;
+    updateGL();
+}
+
+void RobotVisualisation::zoomOut()
+{
+    m_l-=0.2;
+    updateGL();
+}
+
+static void qNormalizeAngle(int &angle)
+{
+    while (angle < 0)
+        angle += 360 * 16;
+    while (angle > 360 * 16)
+        angle -= 360 * 16;
+}
+
+void RobotVisualisation::setXRotation(int angle)
+{
+    qNormalizeAngle(angle);
+    if (angle != xRot) {
+        xRot = angle;
+        emit xRotationChanged(angle);
+        updateGL();
+    }
+}
+
+void RobotVisualisation::setYRotation(int angle)
+{
+    qNormalizeAngle(angle);
+    if (angle != yRot) {
+        yRot = angle;
+        emit xRotationChanged(angle);
+        updateGL();
+    }
+}
+
+void RobotVisualisation::setZRotation(int angle)
+{
+    qNormalizeAngle(angle);
+    if (angle != zRot) {
+        zRot = angle;
+        emit xRotationChanged(angle);
+        updateGL();
+    }
 }

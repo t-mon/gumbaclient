@@ -21,6 +21,8 @@ signals:
 
     void motorLeft(const int &motorCurrent);
     void motorRight(const int &motorCurrent);
+    void speedLeft(const double &speedLeft);
+    void speedRight(const double &speedRight);
     void lightLeft(const int &lightIntensity);
     void lightRight(const int &lightIntensity);
 
@@ -46,9 +48,6 @@ public slots:
     void connectToHost(QString ipAddress, QString port);
     void disconnectFromHost();
     void sendData(QString target, QString command);
-
-
-
 };
 
 
