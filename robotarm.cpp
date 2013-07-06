@@ -1,7 +1,7 @@
 #include "robotarm.h"
 #include <math.h>
 
-#define L1 0
+#define L1 50
 #define L2 100
 #define L3 100
 #define L4 50
