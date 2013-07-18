@@ -30,7 +30,17 @@ RobotVisualisation::RobotVisualisation(QWidget *parent)
     : QGLWidget(QGLFormat(QGL::SampleBuffers),parent)
 {
     // Scale
-    m_l=6;
+    m_l=1;
+    m_L1 = m_l/10+m_l/30;
+    m_L2 = m_l/5+m_l/15;
+    m_L3 = m_l/5+m_l/15;
+    m_L4 = m_l/15+m_l/30+m_l/30;
+
+    qDebug() << "L1=" << m_L1 << "L2=" << m_L2 << "L3=" << m_L3 << "L4=" << m_L4;
+
+    setXRotation(4991);
+    setYRotation(50);
+
 }
 
 void RobotVisualisation::initializeGL()
@@ -53,7 +63,7 @@ void RobotVisualisation::paintGL()
     glClear(GL_COLOR_BUFFER_BIT);
     glLoadIdentity();
 
-    glTranslatef(0.0,0.0,-10.5);
+    glTranslatef(0.0,0.0,-2);
     glRotatef(xRot / 16.0, 1.0, 0.0, 0.0);
     glRotatef(yRot / 16.0, 0.0, 1.0, 0.0);
     glRotatef(zRot / 16.0, 0.0, 0.0, 1.0);
@@ -74,7 +84,7 @@ void RobotVisualisation::paintGL()
     //Second Joint (servo1)
     glTranslatef (0,0,m_l/30);
     glColor3f(0.8,0.8,0.8);
-    glutSolidSphere(m_l/30,32,32);
+    glutWireSphere(m_l/30,32,32);
 
     glPushMatrix();
     glRotatef(90,1,0,0);
@@ -92,7 +102,7 @@ void RobotVisualisation::paintGL()
     glRotatef(-90,0,1,0);
     glPushMatrix();
     glColor3f(0.8,0.8,0.8);
-    glutSolidSphere(m_l/30,32,32);
+    glutWireSphere(m_l/30,32,32);
     glRotatef((GLfloat) servo2,0,0,1);
     drawKoordinateSystem();
 
@@ -107,22 +117,29 @@ void RobotVisualisation::paintGL()
     glRotatef(-90,0,1,0);
     glPushMatrix();
     glColor3f(0.8,0.8,0.8);
-    glutSolidSphere(m_l/30,32,32);
+    glutWireSphere(m_l/30,32,32);
     glRotatef((GLfloat) servo3+90,0,0,1);
     drawKoordinateSystem();
 
     //L4
     glRotatef(90,0,1,0);
-    glTranslatef (0,0,m_l/30);
-    glPushMatrix();
-    drawCylinder(m_l/30,m_l/15);
+//    glTranslatef (0,0,m_l/30);
+//    glPushMatrix();
+//    drawCylinder(m_l/30,m_l/15);
 
     //Fith joint (servo4)
-    glTranslatef (0,0,m_l/30+m_l/15);
+    glTranslatef (0,0,m_l/30+m_l/30);
+    glRotatef(90,0,0,1);
     glPushMatrix();
     glRotatef((GLfloat)servo4,0,0,1);
+    glColor3f(0.5,0.5,0.5);
+    glutWireCube(m_l/15);
     drawKoordinateSystem();
 
+    //TCP
+    glTranslatef (0,0,m_l/15);
+    glPushMatrix();
+    drawKoordinateSystem();
 
     glPopMatrix();
     glPopMatrix();
@@ -151,9 +168,35 @@ void RobotVisualisation::mouseMoveEvent(QMouseEvent *event)
         setYRotation(yRot + 10 * dx);
     } else if (event->buttons() & Qt::RightButton) {
         setXRotation(xRot + 10 * dy);
-        setZRotation(zRot + 10 * dx);
+        setYRotation(yRot + 10 * dx);
     }
     lastPos = event->pos();
+}
+
+void RobotVisualisation::wheelEvent(QWheelEvent *event)
+{
+    if(event->orientation()==Qt::Horizontal){
+        int dz=event->y() - lastPos.y();
+        qDebug() << "scroll horizontal";
+        if(event->delta() > 0){
+            setZRotation(zRot + 10 * dz);
+        }
+        if(event->delta() > 0){
+            setZRotation(zRot - 10 * dz);
+        }
+        lastPos = event->pos();
+    }
+    if(event->orientation()==Qt::Vertical){
+        //qDebug() << "scroll vertical" << event->delta();
+        if(event->delta() > 0){
+            m_l+=0.02;
+            updateGL();
+        }
+        if(event->delta() < 0){
+            m_l-=0.02;
+            updateGL();
+        }
+    }
 }
 
 
@@ -273,13 +316,13 @@ void RobotVisualisation::updateservo5(int degree)
 
 void RobotVisualisation::zoomIn()
 {
-    m_l+=0.2;
+    m_l+=0.01;
     updateGL();
 }
 
 void RobotVisualisation::zoomOut()
 {
-    m_l-=0.2;
+    m_l-=0.01;
     updateGL();
 }
 
@@ -297,6 +340,7 @@ void RobotVisualisation::setXRotation(int angle)
     if (angle != xRot) {
         xRot = angle;
         emit xRotationChanged(angle);
+        //qDebug() << "x=" << angle;
         updateGL();
     }
 }
@@ -307,6 +351,7 @@ void RobotVisualisation::setYRotation(int angle)
     if (angle != yRot) {
         yRot = angle;
         emit xRotationChanged(angle);
+        //qDebug() << "y=" << angle;
         updateGL();
     }
 }

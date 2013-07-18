@@ -39,7 +39,7 @@ Core::Core(QObject *parent) :
     connect(m_wiiMoteThread,SIGNAL(finished()),this,SLOT(wiiProcessFinished()));
 
     connect(m_arm,SIGNAL(writeToTerminal(QString)),m_mainwindow,SLOT(writeToTerminal(QString)));
-    connect(m_arm,SIGNAL(updateTcpPosition(float,float,float)),m_mainwindow,SLOT(tcpPositionChanged(float,float,float)));
+    connect(m_arm,SIGNAL(updateTcpPosition(float,float,float,float,float,float)),m_mainwindow,SLOT(tcpPositionChanged(float,float,float,float,float,float)));
     connect(m_mainwindow,SIGNAL(calculatePosition(float,float,float,float,float)),m_arm,SLOT(updateAngles(float,float,float,float,float)));
 
     connect(m_gumbaMove,SIGNAL(writeToTerminal(QString)),m_mainwindow,SLOT(writeToTerminal(QString)));

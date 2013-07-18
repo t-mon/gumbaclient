@@ -9,9 +9,10 @@ QT       += core gui network opengl
 TARGET = gumbaclient
 TEMPLATE = app
 
-LIBS += -lqjson -L/usr/local/lib/ -lwiicpp -lGL -lGLU -lglut
+LIBS += -lqjson -L/usr/local/lib/ -lwiicpp -lGL -lGLU -lglut -L/usr/lib/octave/3.6.4/ -loctave
 
 INCLUDEPATH += /usr/local/include/wiic/
+INCLUDEPATH += /usr/include/octave-3.6.4/
 
 
 SOURCES += main.cpp\
@@ -21,7 +22,8 @@ SOURCES += main.cpp\
     qwiimote.cpp \
     robotarm.cpp \
     robotvisualisation.cpp \
-    gumbamovement.cpp
+    gumbamovement.cpp \
+    gumbabehavior.cpp
 
 HEADERS  += mainwindow.h \
     core.h \
@@ -29,5 +31,6 @@ HEADERS  += mainwindow.h \
     qwiimote.h \
     robotarm.h \
     robotvisualisation.h \
-    gumbamovement.h
+    gumbamovement.h \
+    gumbabehavior.h
 

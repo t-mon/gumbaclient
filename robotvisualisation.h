@@ -38,6 +38,7 @@ protected:
     void paintGL();
     void mousePressEvent(QMouseEvent *event);
     void mouseMoveEvent(QMouseEvent *event);
+    void wheelEvent(QWheelEvent *event);
 
 
     void drawGrid();
@@ -47,6 +48,10 @@ protected:
 private:
     // Gridsize
     float m_l;
+    float m_L1;
+    float m_L2;
+    float m_L3;
+    float m_L4;
 
     int xRot;
     int yRot;

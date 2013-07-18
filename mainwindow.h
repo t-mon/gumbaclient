@@ -21,7 +21,7 @@
 #define downLimitBig 57
 #define upLimitSmall 227
 #define downLimitSmall 50
-#define periodMove 3000
+#define periodMove 4000
 
 namespace Ui {
 class MainWindow;
@@ -61,9 +61,9 @@ private:
     QLabel *tcp_x_Lable;
     QLabel *tcp_y_Lable;
     QLabel *tcp_z_Lable;
-    QLabel *tcp_roll_Lable;
-    QLabel *tcp_pitch_Lable;
-    QLabel *tcp_yaw_Lable;
+    QLabel *tcp_wx_Lable;
+    QLabel *tcp_wy_Lable;
+    QLabel *tcp_wz_Lable;
 
 
     float convertPwmToDegreeBig(int pwm);
@@ -209,7 +209,7 @@ public slots:
 
     void wiiMoteABChanged(const bool &pressedState);
 
-    void tcpPositionChanged(const float &x, const float &y, const float &z);
+    void tcpPositionChanged(const float &x, const float &y, const float &z, const float &wx, const float &wy, const float &wz);
 
     void moveServo(const int &servoNumber, const int &start, const int &end, const int &period);
     void allSevosPwmOff();

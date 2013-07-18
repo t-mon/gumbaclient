@@ -7,7 +7,7 @@
 #include <QDebug>
 #include <QKeyEvent>
 #include <QIcon>
-
+#include <math.h>
 
 
 #include "mainwindow.h"
@@ -15,12 +15,12 @@
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent)
 {
-    m_angle0 = (downLimitBig+upLimitBig)/2;
-    m_angle1 = (downLimitBig+upLimitBig)/2;
-    m_angle2 = (downLimitBig+upLimitBig)/2;
-    m_angle3 = (downLimitBig+upLimitBig)/2;
-    m_angle4 = (downLimitSmall+upLimitSmall)/2;
-    m_angle4 = (downLimitSmall+upLimitSmall)/2;
+    m_angle0 = M_PI_2;
+    m_angle1 = M_PI_2;
+    m_angle2 = M_PI_2;
+    m_angle3 = M_PI_2;
+    m_angle4 = M_PI_2;
+    m_angle5 = (downLimitSmall+upLimitSmall)/2;
 
     m_wiiMoteABstate = false;
 
@@ -304,10 +304,13 @@ QGroupBox *MainWindow::createServoControllGroupBox()
     // ===================================================== Servo 0
     servo0Slider = new QSlider(Qt::Horizontal, this);
     servo0Slider->setFixedWidth(100);
-    servo0Slider->setTickInterval(1);
-    servo0Slider->setMinimum(downLimitBig);
-    servo0Slider->setMaximum(upLimitBig);
-    servo0Slider->setValue((downLimitBig+upLimitBig)/2);
+    servo0Slider->setTickInterval(100);
+    servo0Slider->setMinimum(0);
+    servo0Slider->setMaximum(M_PI*100000);
+    servo0Slider->setValue(M_PI_2*100000);
+    //    servo0Slider->setMinimum(downLimitBig);
+    //    servo0Slider->setMaximum(upLimitBig);
+    //    servo0Slider->setValue((downLimitBig+upLimitBig)/2);
 
     servo0Label = new QLabel(this);
     servo0Label->setFixedWidth(60);
@@ -317,10 +320,13 @@ QGroupBox *MainWindow::createServoControllGroupBox()
     // ===================================================== Servo 1
     servo1Slider = new QSlider(Qt::Horizontal, this);
     servo1Slider->setFixedWidth(100);
-    servo1Slider->setTickInterval(1);
-    servo1Slider->setMinimum(downLimitBig);
-    servo1Slider->setMaximum(upLimitBig);
-    servo1Slider->setValue((downLimitBig+upLimitBig)/2);
+    servo1Slider->setTickInterval(100);
+    servo1Slider->setMinimum(0);
+    servo1Slider->setMaximum(M_PI*100000);
+    servo1Slider->setValue(M_PI_2*100000);
+    //    servo1Slider->setMinimum(downLimitBig);
+    //    servo1Slider->setMaximum(upLimitBig);
+    //    servo1Slider->setValue((downLimitBig+upLimitBig)/2);
 
     servo1Label = new QLabel(this);
     servo1Label->setAlignment(Qt::AlignCenter);
@@ -329,10 +335,13 @@ QGroupBox *MainWindow::createServoControllGroupBox()
     // ===================================================== Servo 2
     servo2Slider = new QSlider(Qt::Horizontal, this);
     servo2Slider->setFixedWidth(100);
-    servo2Slider->setTickInterval(1);
-    servo2Slider->setMinimum(downLimitBig);
-    servo2Slider->setMaximum(upLimitBig);
-    servo2Slider->setValue((downLimitBig+upLimitBig)/2);
+    servo2Slider->setTickInterval(100);
+    servo2Slider->setMinimum(0);
+    servo2Slider->setMaximum(M_PI*100000);
+    servo2Slider->setValue(M_PI_2*100000);
+    //    servo2Slider->setMinimum(downLimitBig);
+    //    servo2Slider->setMaximum(upLimitBig);
+    //    servo2Slider->setValue((downLimitBig+upLimitBig)/2);
 
     servo2Label = new QLabel(this);
     servo2Label->setAlignment(Qt::AlignCenter);
@@ -342,10 +351,13 @@ QGroupBox *MainWindow::createServoControllGroupBox()
     // ===================================================== Servo 3
     servo3Slider = new QSlider(Qt::Horizontal, this);
     servo3Slider->setFixedWidth(100);
-    servo3Slider->setTickInterval(1);
-    servo3Slider->setMinimum(downLimitBig);
-    servo3Slider->setMaximum(upLimitBig);
-    servo3Slider->setValue((downLimitBig+upLimitBig)/2);
+    servo3Slider->setTickInterval(100);
+    servo3Slider->setMinimum(0);
+    servo3Slider->setMaximum(M_PI*100000);
+    servo3Slider->setValue(M_PI_2*100000);
+    //    servo3Slider->setMinimum(downLimitBig);
+    //    servo3Slider->setMaximum(upLimitBig);
+    //    servo3Slider->setValue((downLimitBig+upLimitBig)/2);
 
     servo3Label = new QLabel(this);
     servo3Label->setAlignment(Qt::AlignCenter);
@@ -354,10 +366,13 @@ QGroupBox *MainWindow::createServoControllGroupBox()
     // ===================================================== Servo 4
     servo4Slider = new QSlider(Qt::Horizontal, this);
     servo4Slider->setFixedWidth(100);
-    servo4Slider->setTickInterval(1);
-    servo4Slider->setMinimum(downLimitSmall);
-    servo4Slider->setMaximum(upLimitSmall);
-    servo4Slider->setValue((downLimitSmall+upLimitSmall)/2);
+    servo4Slider->setTickInterval(100);
+    servo4Slider->setMinimum(0);
+    servo4Slider->setMaximum(M_PI*100000);
+    servo4Slider->setValue(M_PI_2*100000);
+//    servo4Slider->setMinimum(downLimitSmall);
+//    servo4Slider->setMaximum(upLimitSmall);
+//    servo4Slider->setValue((downLimitSmall+upLimitSmall)/2);
 
     servo4Label = new QLabel(this);
     servo4Label->setAlignment(Qt::AlignCenter);
@@ -462,28 +477,46 @@ QGroupBox *MainWindow::createServoControllGroupBox()
 
 QGroupBox *MainWindow::createServoPositionGroupBox()
 {
-    QGroupBox *createServoPositionGroupBox = new QGroupBox(tr("TCP Position"),this);
+    QGroupBox *createServoPositionGroupBox = new QGroupBox(tr("TCP Pose"),this);
     QVBoxLayout *servoPositionLayout = new QVBoxLayout;
     createServoPositionGroupBox->setLayout(servoPositionLayout);
 
     tcp_x_Lable = new QLabel(this);
     tcp_x_Lable->setFixedWidth(100);
     tcp_x_Lable->setAlignment(Qt::AlignLeft);
-    tcp_x_Lable->setText("x = ");
+    tcp_x_Lable->setText("x  = ");
 
     tcp_y_Lable = new QLabel(this);
     tcp_y_Lable->setFixedWidth(100);
     tcp_y_Lable->setAlignment(Qt::AlignLeft);
-    tcp_y_Lable->setText("y = ");
+    tcp_y_Lable->setText("y  = ");
 
     tcp_z_Lable = new QLabel(this);
     tcp_z_Lable->setFixedWidth(100);
     tcp_z_Lable->setAlignment(Qt::AlignLeft);
-    tcp_z_Lable->setText("z = ");
+    tcp_z_Lable->setText("z  = ");
+
+    tcp_wx_Lable = new QLabel(this);
+    tcp_wx_Lable->setFixedWidth(100);
+    tcp_wx_Lable->setAlignment(Qt::AlignLeft);
+    tcp_wx_Lable->setText("wx = ");
+
+    tcp_wy_Lable = new QLabel(this);
+    tcp_wy_Lable->setFixedWidth(100);
+    tcp_wy_Lable->setAlignment(Qt::AlignLeft);
+    tcp_wy_Lable->setText("wy = ");
+
+    tcp_wz_Lable = new QLabel(this);
+    tcp_wz_Lable->setFixedWidth(100);
+    tcp_wz_Lable->setAlignment(Qt::AlignLeft);
+    tcp_wz_Lable->setText("wz = ");
 
     servoPositionLayout->addWidget(tcp_x_Lable);
     servoPositionLayout->addWidget(tcp_y_Lable);
     servoPositionLayout->addWidget(tcp_z_Lable);
+    servoPositionLayout->addWidget(tcp_wx_Lable);
+    servoPositionLayout->addWidget(tcp_wy_Lable);
+    servoPositionLayout->addWidget(tcp_wz_Lable);
 
     return createServoPositionGroupBox;
 }
@@ -718,17 +751,23 @@ void MainWindow::toggleRTSClicked()
 
 void MainWindow::servo0SliderChanged(const int &pos)
 {
-    servo0Label->setText("S0 = " + QString::number(convertPwmToDegreeBig(pos)));
+    servo0Label->setText("S0 = " + QString::number((float)pos/100000 *180 /M_PI - 90));
     emit sendCommand("Servo0",QString::number(pos));
-    m_angle0 = (pos);
-    m_visualisation->updateservo0(convertPwmToDegreeBig(pos));
-    emit calculatePosition(convertPwmToDegreeBig(pos),convertPwmToDegreeBig(m_angle1),convertPwmToDegreeBig(m_angle2),convertPwmToDegreeBig(m_angle3),convertPwmToDegreeBig(m_angle4));
+    m_angle0 = (float)pos/100000;
+    m_visualisation->updateservo0((float)pos/100000 *180 /M_PI - 90);
+    //    qDebug() << "pos=" << pos;
+    float pos_f=(float)pos/100000;
+    //    qDebug() << "pos_f=" << pos_f;
+    emit calculatePosition(pos_f,m_angle1,m_angle2,m_angle3,m_angle4);
+
+//    m_visualisation->updateservo0(convertPwmToDegreeBig(pos));
+//    emit calculatePosition(convertPwmToDegreeBig(pos),convertPwmToDegreeBig(m_angle1),convertPwmToDegreeBig(m_angle2),convertPwmToDegreeBig(m_angle3),convertPwmToDegreeBig(m_angle4));
 
 }
 
 void MainWindow::servo0animationClicked()
 {
-    moveServo(0,m_angle0,(downLimitBig+upLimitBig)/2,periodMove);
+    moveServo(0,m_angle0*100000,M_PI_2*100000,periodMove);
 
 }
 
@@ -741,17 +780,18 @@ void MainWindow::servo0PowerOffClicked()
 
 void MainWindow::servo1SliderChanged(const int &pos)
 {
-    servo1Label->setText("S1 = " + QString::number(convertPwmToDegreeBig(pos)));
+    servo1Label->setText("S1 = " + QString::number((float)pos/100000 *180 /M_PI - 90));
     emit sendCommand("Servo1",QString::number(pos));
-    m_angle1 = (pos);
-    m_visualisation->updateservo1(convertPwmToDegreeBig(pos));
-    emit calculatePosition(convertPwmToDegreeBig(m_angle0),convertPwmToDegreeBig(pos),convertPwmToDegreeBig(m_angle2),convertPwmToDegreeBig(m_angle3),convertPwmToDegreeBig(m_angle4));
+    m_angle1 = (float)pos/100000;
+    m_visualisation->updateservo1((float)pos/100000 *180 /M_PI - 90);
+    float pos_f=(float)pos/100000;
+    emit calculatePosition(m_angle0,pos_f,m_angle2,m_angle3,m_angle4);
 
 }
 
 void MainWindow::servo1animationClicked()
 {
-    moveServo(1,m_angle1,(downLimitBig+upLimitBig)/2,periodMove);
+    moveServo(1,m_angle1*100000,M_PI_2*100000,periodMove);
 }
 
 void MainWindow::servo1PowerOffClicked()
@@ -764,17 +804,20 @@ void MainWindow::servo1PowerOffClicked()
 
 void MainWindow::servo2SliderChanged(const int &pos)
 {
-    servo2Label->setText("S2 = " + QString::number(convertPwmToDegreeBig(pos)));
+    servo2Label->setText("S2 = " + QString::number((float)pos/100000 *180 /M_PI - 90));
     emit sendCommand("Servo2",QString::number(pos));
-    m_angle2 = pos;
-    m_visualisation->updateservo2(convertPwmToDegreeBig(pos));
-    emit calculatePosition(convertPwmToDegreeBig(m_angle0),convertPwmToDegreeBig(m_angle1),convertPwmToDegreeBig(pos),convertPwmToDegreeBig(m_angle4),convertPwmToDegreeBig(m_angle4));
+    m_angle2 = (float)pos/100000;
+    m_visualisation->updateservo2((float)pos/100000 *180 /M_PI - 90);
+    float pos_f=(float)pos/100000;
+    emit calculatePosition(m_angle0,m_angle1,pos_f,m_angle3,m_angle4);
+//    m_visualisation->updateservo2(convertPwmToDegreeBig(pos));
+//    emit calculatePosition(convertPwmToDegreeBig(m_angle0),convertPwmToDegreeBig(m_angle1),convertPwmToDegreeBig(pos),convertPwmToDegreeBig(m_angle4),convertPwmToDegreeBig(m_angle4));
 
 }
 
 void MainWindow::servo2animationClicked()
 {
-    moveServo(2,m_angle2,(downLimitBig+upLimitBig)/2,periodMove);
+    moveServo(2,m_angle2*100000,M_PI_2*100000,periodMove);
 }
 
 void MainWindow::servo2PowerOffClicked()
@@ -786,16 +829,20 @@ void MainWindow::servo2PowerOffClicked()
 
 void MainWindow::servo3SliderChanged(const int &pos)
 {
-    servo3Label->setText("S3 = " + QString::number(convertPwmToDegreeBig(pos)));
+    servo3Label->setText("S3 = " + QString::number((float)pos/100000 *180 /M_PI - 90));
     emit sendCommand("Servo3",QString::number(pos));
-    m_angle3 = (pos);
-    m_visualisation->updateservo3(convertPwmToDegreeBig(pos));
-    emit calculatePosition(convertPwmToDegreeBig(m_angle0),convertPwmToDegreeBig(m_angle1),convertPwmToDegreeBig(m_angle2),convertPwmToDegreeBig(pos),convertPwmToDegreeBig(m_angle4));
+    m_angle3 = (float)pos/100000;
+    m_visualisation->updateservo3((float)pos/100000 *180 /M_PI - 90);
+    float pos_f=(float)pos/100000;
+    emit calculatePosition(m_angle0,m_angle1,m_angle2,pos_f,m_angle4);
+
+//    m_visualisation->updateservo3(convertPwmToDegreeBig(pos));
+//    emit calculatePosition(convertPwmToDegreeBig(m_angle0),convertPwmToDegreeBig(m_angle1),convertPwmToDegreeBig(m_angle2),convertPwmToDegreeBig(pos),convertPwmToDegreeBig(m_angle4));
 }
 
 void MainWindow::servo3animationClicked()
 {
-    moveServo(3,m_angle3,(downLimitBig+upLimitBig)/2,periodMove);
+    moveServo(3,m_angle3*100000,M_PI_2*100000,periodMove);
 }
 
 void MainWindow::servo3PowerOffClicked()
@@ -807,16 +854,20 @@ void MainWindow::servo3PowerOffClicked()
 
 void MainWindow::servo4SliderChanged(const int &pos)
 {
-    servo4Label->setText("S4 = " + QString::number(convertPwmToDegreeSmall(pos)));
+    servo4Label->setText("S4 = " + QString::number((float)pos/100000 *180 /M_PI - 90));
     emit sendCommand("Servo4",QString::number(pos));
-    m_angle4 = (pos);
-    m_visualisation->updateservo4(convertPwmToDegreeBig(pos));
-    emit calculatePosition(convertPwmToDegreeBig(m_angle0),convertPwmToDegreeBig(m_angle1),convertPwmToDegreeBig(m_angle2),convertPwmToDegreeBig(m_angle3),convertPwmToDegreeBig(pos));
+    m_angle4 = (float)pos/100000;
+    m_visualisation->updateservo4((float)pos/100000 *180 /M_PI - 90);
+    float pos_f=(float)pos/100000;
+    emit calculatePosition(m_angle0,m_angle1,m_angle2,m_angle3,pos_f);
+
+//    m_visualisation->updateservo4(convertPwmToDegreeBig(pos));
+//    emit calculatePosition(convertPwmToDegreeBig(m_angle0),convertPwmToDegreeBig(m_angle1),convertPwmToDegreeBig(m_angle2),convertPwmToDegreeBig(m_angle3),convertPwmToDegreeBig(pos));
 }
 
 void MainWindow::servo4animationClicked()
 {
-    moveServo(4,m_angle4,(downLimitSmall+upLimitSmall)/2,periodMove);
+    moveServo(4,m_angle4*100000,M_PI_2*100000,periodMove);
 }
 
 void MainWindow::servo4PowerOffClicked()
@@ -873,7 +924,7 @@ void MainWindow::moveServo(const int &servoNumber, const int &start, const int &
     //InOutCubic
     //InOutQuint
 
-    QEasingCurve movementCurve = QEasingCurve::InOutQuint;
+    QEasingCurve movementCurve = QEasingCurve::Linear;
 
     switch(servoNumber){
     case 0:
@@ -931,12 +982,12 @@ void MainWindow::initServoClicked()
 
 void MainWindow::servoHomePositionClicked()
 {
-    moveServo(0,(m_angle0),(downLimitBig+upLimitBig)/2,periodMove);
-    moveServo(1,(m_angle1),(downLimitBig+upLimitBig)/2,periodMove);
-    moveServo(2,(m_angle2),(downLimitBig+upLimitBig)/2,periodMove);
-    moveServo(3,(m_angle3),(downLimitBig+upLimitBig)/2,periodMove);
-    moveServo(4,(m_angle4),(downLimitSmall+upLimitSmall)/2,periodMove);
-    moveServo(5,(m_angle5),(downLimitSmall+upLimitSmall)/2,periodMove);
+    moveServo(0,(m_angle0*100000),M_PI_2*100000,periodMove);
+    moveServo(1,(m_angle1*100000),M_PI_2*100000,periodMove);
+    moveServo(2,(m_angle2*100000),M_PI_2*100000,periodMove);
+    moveServo(3,(m_angle3*100000),M_PI_2*100000,periodMove);
+    moveServo(4,(m_angle4*100000),M_PI_2*100000,periodMove);
+    moveServo(5,(m_angle5*100000),(downLimitSmall+upLimitSmall)/2,periodMove);
 
 }
 
@@ -1004,16 +1055,16 @@ void MainWindow::updateGuitarHeroWhaaData(const float &whaa)
 void MainWindow::updateWiiBattery(const float &battery)
 {
     int batteryPercent = battery*100;
-//    if(batteryPercent >= 30){
-//        wiiBatteryBar->setStyleSheet(wiiBatteryBar->property("defaultStyleSheet").toString() +" QProgressBar::chunk { background: green;}");
-//    }else{
-//        if(batteryPercent < 30){
-//            wiiBatteryBar->setStyleSheet(wiiBatteryBar->property("defaultStyleSheet").toString() +" QProgressBar::chunk { background: yellow;}");
-//        }
-//        if(batteryPercent < 15){
-//            wiiBatteryBar->setStyleSheet(wiiBatteryBar->property("defaultStyleSheet").toString() +" QProgressBar::chunk { background: red;}");
-//        }
-//    }
+    //    if(batteryPercent >= 30){
+    //        wiiBatteryBar->setStyleSheet(wiiBatteryBar->property("defaultStyleSheet").toString() +" QProgressBar::chunk { background: green;}");
+    //    }else{
+    //        if(batteryPercent < 30){
+    //            wiiBatteryBar->setStyleSheet(wiiBatteryBar->property("defaultStyleSheet").toString() +" QProgressBar::chunk { background: yellow;}");
+    //        }
+    //        if(batteryPercent < 15){
+    //            wiiBatteryBar->setStyleSheet(wiiBatteryBar->property("defaultStyleSheet").toString() +" QProgressBar::chunk { background: red;}");
+    //        }
+    //    }
     wiiBatteryBar->setValue(batteryPercent);
 }
 
@@ -1113,11 +1164,14 @@ void MainWindow::wiiMoteABChanged(const bool &pressedState)
     m_wiiMoteABstate = pressedState;
 }
 
-void MainWindow::tcpPositionChanged(const float &x, const float &y, const float &z)
+void MainWindow::tcpPositionChanged(const float &x, const float &y, const float &z, const float &wx, const float &wy, const float &wz)
 {
-    tcp_x_Lable->setText("x = " + QString::number(x));
-    tcp_y_Lable->setText("y = " + QString::number(y));
-    tcp_z_Lable->setText("z = " + QString::number(z));
+    tcp_x_Lable->setText("x  = " + QString::number(x));
+    tcp_y_Lable->setText("y  = " + QString::number(y));
+    tcp_z_Lable->setText("z  = " + QString::number(z));
+    tcp_wx_Lable->setText("wx = " + QString::number(wx*180/M_PI));
+    tcp_wy_Lable->setText("wy = " + QString::number(wy*180/M_PI));
+    tcp_wz_Lable->setText("wz = " + QString::number(wz*180/M_PI));
 
 }
 
