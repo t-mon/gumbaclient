@@ -43,6 +43,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(this,SIGNAL(zoomIn()),m_visualisation,SLOT(zoomIn()));
     connect(this,SIGNAL(zoomOut()),m_visualisation,SLOT(zoomOut()));
 
+    emit calculatePosition(m_angle0,m_angle1,m_angle2,m_angle3,m_angle4);
 
 }
 
@@ -446,6 +447,9 @@ QGroupBox *MainWindow::createServoControllGroupBox()
     servoControllGrid->addWidget(servo4GroupBox,7,0);
     servoControllGrid->addWidget(servo5GroupBox,8,0);
     servoControllGrid->addWidget(createServoPositionGroupBox(),3,1);
+    servoControllGrid->addWidget(createTcpControllGroupBox(),4,1);
+
+
 
     connect(initServo,SIGNAL(clicked()),this,SLOT(initServoClicked()));
     connect(servoHomePositionButton,SIGNAL(clicked()),this,SLOT(servoHomePositionClicked()));
@@ -521,14 +525,48 @@ QGroupBox *MainWindow::createServoPositionGroupBox()
     return createServoPositionGroupBox;
 }
 
+QGroupBox *MainWindow::createTcpControllGroupBox()
+{
+    QGroupBox *tcpControllGroupBox = new QGroupBox(tr("Move in KKO"),this);
+    QGridLayout *tcpControllLayout = new QGridLayout(this);
+    tcpControllGroupBox->setLayout(tcpControllLayout);
+
+
+    QPushButton *xPlus = new QPushButton("x +",this);
+    QPushButton *xMinus = new QPushButton("x -",this);
+    QPushButton *yPlus = new QPushButton("y +",this);
+    QPushButton *yMinus = new QPushButton("y -",this);
+    QPushButton *zPlus = new QPushButton("z +",this);
+    QPushButton *zMinus = new QPushButton("z -",this);
+
+    tcpControllLayout->addWidget(xMinus,0,0);
+    tcpControllLayout->addWidget(xPlus,0,1);
+    tcpControllLayout->addWidget(yMinus,1,0);
+    tcpControllLayout->addWidget(yPlus,1,1);
+    tcpControllLayout->addWidget(zMinus,2,0);
+    tcpControllLayout->addWidget(zPlus,2,1);
+
+    zPlus->setFixedWidth(50);
+    zMinus->setFixedWidth(50);
+
+    connect(xPlus,SIGNAL(clicked()),this,SLOT(tcpXPlusClicked()));
+    connect(xMinus,SIGNAL(clicked()),this,SLOT(tcpXMinusClicked()));connect(zPlus,SIGNAL(clicked()),this,SLOT(tcpZPlusClicked()));
+    connect(yMinus,SIGNAL(clicked()),this,SLOT(tcpYMinusClicked()));
+    connect(yPlus,SIGNAL(clicked()),this,SLOT(tcpYPlusClicked()));
+    connect(zMinus,SIGNAL(clicked()),this,SLOT(tcpZMinusClicked()));
+    connect(zPlus,SIGNAL(clicked()),this,SLOT(tcpZPlusClicked()));
+
+    return tcpControllGroupBox;
+}
+
 QGroupBox *MainWindow::createTerminalGroupBox()
 {
     QGroupBox *terminalGroupBox = new QGroupBox(tr("Terminal"),this);
-    QVBoxLayout *terminalLayout = new QVBoxLayout;
+    QVBoxLayout *terminalLayout = new QVBoxLayout(this);
 
     terminalLayout->setSizeConstraint(QLayout::SetNoConstraint);
 
-    QTabWidget *tabs = new QTabWidget();
+    QTabWidget *tabs = new QTabWidget(this);
 
     // Terminal
     terminalView = new QTextEdit(this);
@@ -548,13 +586,13 @@ QGroupBox *MainWindow::createTerminalGroupBox()
 
 QWidget *MainWindow::createWiiMoteGroupBox()
 {
-    QWidget *wiiWidget = new QWidget();
-    QVBoxLayout *wiiWidgetLayout = new QVBoxLayout();
+    QWidget *wiiWidget = new QWidget(this);
+    QVBoxLayout *wiiWidgetLayout = new QVBoxLayout(this);
 
     wiiWidget->setLayout(wiiWidgetLayout);
 
-    QPushButton *startWiiMoteButton = new QPushButton("Start WiiMote");
-    QPushButton *disconnectWiiMoteButton = new QPushButton("Disconnct WiiMote");
+    QPushButton *startWiiMoteButton = new QPushButton("Start WiiMote",this);
+    QPushButton *disconnectWiiMoteButton = new QPushButton("Disconnct WiiMote",this);
 
     QGroupBox *wiiGroupBox = new QGroupBox(tr("Wii"),this);
     QGroupBox *nunchuckGroupBox = new QGroupBox(tr("Nunchuck"),this);
@@ -754,11 +792,8 @@ void MainWindow::servo0SliderChanged(const int &pos)
     servo0Label->setText("S0 = " + QString::number((float)pos/100000 *180 /M_PI - 90));
     emit sendCommand("Servo0",QString::number(pos));
     m_angle0 = (float)pos/100000;
-    m_visualisation->updateservo0((float)pos/100000 *180 /M_PI - 90);
-    //    qDebug() << "pos=" << pos;
-    float pos_f=(float)pos/100000;
-    //    qDebug() << "pos_f=" << pos_f;
-    emit calculatePosition(pos_f,m_angle1,m_angle2,m_angle3,m_angle4);
+    m_visualisation->updateservo0(m_angle0 *180 /M_PI - 90);
+    emit calculatePosition(m_angle0,m_angle1,m_angle2,m_angle3,m_angle4);
 
 //    m_visualisation->updateservo0(convertPwmToDegreeBig(pos));
 //    emit calculatePosition(convertPwmToDegreeBig(pos),convertPwmToDegreeBig(m_angle1),convertPwmToDegreeBig(m_angle2),convertPwmToDegreeBig(m_angle3),convertPwmToDegreeBig(m_angle4));
@@ -783,10 +818,8 @@ void MainWindow::servo1SliderChanged(const int &pos)
     servo1Label->setText("S1 = " + QString::number((float)pos/100000 *180 /M_PI - 90));
     emit sendCommand("Servo1",QString::number(pos));
     m_angle1 = (float)pos/100000;
-    m_visualisation->updateservo1((float)pos/100000 *180 /M_PI - 90);
-    float pos_f=(float)pos/100000;
-    emit calculatePosition(m_angle0,pos_f,m_angle2,m_angle3,m_angle4);
-
+    m_visualisation->updateservo1(m_angle1 *180 /M_PI - 90);
+    emit calculatePosition(m_angle0,m_angle1,m_angle2,m_angle3,m_angle4);
 }
 
 void MainWindow::servo1animationClicked()
@@ -807,12 +840,8 @@ void MainWindow::servo2SliderChanged(const int &pos)
     servo2Label->setText("S2 = " + QString::number((float)pos/100000 *180 /M_PI - 90));
     emit sendCommand("Servo2",QString::number(pos));
     m_angle2 = (float)pos/100000;
-    m_visualisation->updateservo2((float)pos/100000 *180 /M_PI - 90);
-    float pos_f=(float)pos/100000;
-    emit calculatePosition(m_angle0,m_angle1,pos_f,m_angle3,m_angle4);
-//    m_visualisation->updateservo2(convertPwmToDegreeBig(pos));
-//    emit calculatePosition(convertPwmToDegreeBig(m_angle0),convertPwmToDegreeBig(m_angle1),convertPwmToDegreeBig(pos),convertPwmToDegreeBig(m_angle4),convertPwmToDegreeBig(m_angle4));
-
+    m_visualisation->updateservo2(m_angle2 *180 /M_PI - 90);
+    emit calculatePosition(m_angle0,m_angle1,m_angle2,m_angle3,m_angle4);
 }
 
 void MainWindow::servo2animationClicked()
@@ -832,13 +861,8 @@ void MainWindow::servo3SliderChanged(const int &pos)
     servo3Label->setText("S3 = " + QString::number((float)pos/100000 *180 /M_PI - 90));
     emit sendCommand("Servo3",QString::number(pos));
     m_angle3 = (float)pos/100000;
-    m_visualisation->updateservo3((float)pos/100000 *180 /M_PI - 90);
-    float pos_f=(float)pos/100000;
-    emit calculatePosition(m_angle0,m_angle1,m_angle2,pos_f,m_angle4);
-
-//    m_visualisation->updateservo3(convertPwmToDegreeBig(pos));
-//    emit calculatePosition(convertPwmToDegreeBig(m_angle0),convertPwmToDegreeBig(m_angle1),convertPwmToDegreeBig(m_angle2),convertPwmToDegreeBig(pos),convertPwmToDegreeBig(m_angle4));
-}
+    m_visualisation->updateservo3(m_angle3 *180 /M_PI - 90);
+    emit calculatePosition(m_angle0,m_angle1,m_angle2,m_angle3,m_angle4);}
 
 void MainWindow::servo3animationClicked()
 {
@@ -857,13 +881,8 @@ void MainWindow::servo4SliderChanged(const int &pos)
     servo4Label->setText("S4 = " + QString::number((float)pos/100000 *180 /M_PI - 90));
     emit sendCommand("Servo4",QString::number(pos));
     m_angle4 = (float)pos/100000;
-    m_visualisation->updateservo4((float)pos/100000 *180 /M_PI - 90);
-    float pos_f=(float)pos/100000;
-    emit calculatePosition(m_angle0,m_angle1,m_angle2,m_angle3,pos_f);
-
-//    m_visualisation->updateservo4(convertPwmToDegreeBig(pos));
-//    emit calculatePosition(convertPwmToDegreeBig(m_angle0),convertPwmToDegreeBig(m_angle1),convertPwmToDegreeBig(m_angle2),convertPwmToDegreeBig(m_angle3),convertPwmToDegreeBig(pos));
-}
+    m_visualisation->updateservo4(m_angle4 *180 /M_PI - 90);
+    emit calculatePosition(m_angle0,m_angle1,m_angle2,m_angle3,m_angle4);}
 
 void MainWindow::servo4animationClicked()
 {
@@ -895,6 +914,36 @@ void MainWindow::servo5PowerOffClicked()
     servo5Label->setText("S5 = OFF");
     animationServo5->stop();
     emit sendCommand("Servo5",QString::number(0));
+}
+
+void MainWindow::tcpXPlusClicked()
+{
+    emit moveToPosition(1,0,0,0,0,0);
+}
+
+void MainWindow::tcpXMinusClicked()
+{
+    emit moveToPosition(-1,0,0,0,0,0);
+}
+
+void MainWindow::tcpYPlusClicked()
+{
+    emit moveToPosition(0,1,0,0,0,0);
+}
+
+void MainWindow::tcpYMinusClicked()
+{
+    emit moveToPosition(0,-1,0,0,0,0);
+}
+
+void MainWindow::tcpZPlusClicked()
+{
+    emit moveToPosition(0,0,1,0,0,0);
+}
+
+void MainWindow::tcpZMinusClicked()
+{
+    emit moveToPosition(0,0,-1,0,0,0);
 }
 
 void MainWindow::allSevosPwmOff()
@@ -974,6 +1023,16 @@ void MainWindow::moveServo(const int &servoNumber, const int &start, const int &
     }
 }
 
+void MainWindow::moveJoints(float theta1, float theta2, float theta3, float theta4, float theta5)
+{
+    servo0Slider->setValue((m_angle0+theta1)*100000);
+    servo1Slider->setValue((m_angle1+theta2)*100000);
+    servo2Slider->setValue((m_angle2+theta3)*100000);
+    servo3Slider->setValue((m_angle3+theta4)*100000);
+    servo4Slider->setValue((m_angle4+theta5)*100000);
+
+}
+
 
 void MainWindow::initServoClicked()
 {
@@ -987,7 +1046,7 @@ void MainWindow::servoHomePositionClicked()
     moveServo(2,(m_angle2*100000),M_PI_2*100000,periodMove);
     moveServo(3,(m_angle3*100000),M_PI_2*100000,periodMove);
     moveServo(4,(m_angle4*100000),M_PI_2*100000,periodMove);
-    moveServo(5,(m_angle5*100000),(downLimitSmall+upLimitSmall)/2,periodMove);
+    //moveServo(5,(m_angle5*100000),(downLimitSmall+upLimitSmall)/2,periodMove);
 
 }
 
@@ -1172,6 +1231,8 @@ void MainWindow::tcpPositionChanged(const float &x, const float &y, const float 
     tcp_wx_Lable->setText("wx = " + QString::number(wx*180/M_PI));
     tcp_wy_Lable->setText("wy = " + QString::number(wy*180/M_PI));
     tcp_wz_Lable->setText("wz = " + QString::number(wz*180/M_PI));
+    qDebug() << m_angle0 << m_angle1 << m_angle2 << m_angle3 << m_angle4;
+
 
 }
 

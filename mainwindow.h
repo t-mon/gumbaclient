@@ -21,7 +21,7 @@
 #define downLimitBig 57
 #define upLimitSmall 227
 #define downLimitSmall 50
-#define periodMove 4000
+#define periodMove 1500
 
 namespace Ui {
 class MainWindow;
@@ -47,6 +47,7 @@ private:
     QGroupBox *createGumbaServerConnectionGroupBox();
     QGroupBox *createServoControllGroupBox();
     QGroupBox *createServoPositionGroupBox();
+    QGroupBox *createTcpControllGroupBox();
 
     QGroupBox *createTerminalGroupBox();
     QWidget *createWiiMoteGroupBox();
@@ -159,6 +160,14 @@ private slots:
     void servo5PowerOffClicked();
 
 
+    void tcpXPlusClicked();
+    void tcpXMinusClicked();
+    void tcpYPlusClicked();
+    void tcpYMinusClicked();
+    void tcpZPlusClicked();
+    void tcpZMinusClicked();
+
+
     void initServoClicked();
     void servoHomePositionClicked();
     void updateWiiMoteOrientation(const float &roll, const float &pitch, const float &yaw);
@@ -186,7 +195,10 @@ signals:
     void stopWiiMote();
 
     void disconnectServer();
+
     void calculatePosition(float theta1, float theta2, float theta3, float theta4, float theta5);
+    void moveToPosition(const float &x, const float &y, const float &z, const float &wx, const float &wy, const float &wz);
+
 
     void zoomIn();
     void zoomOut();
@@ -212,6 +224,7 @@ public slots:
     void tcpPositionChanged(const float &x, const float &y, const float &z, const float &wx, const float &wy, const float &wz);
 
     void moveServo(const int &servoNumber, const int &start, const int &end, const int &period);
+    void moveJoints(float theta1, float theta2, float theta3, float theta4, float theta5);
     void allSevosPwmOff();
 
 };

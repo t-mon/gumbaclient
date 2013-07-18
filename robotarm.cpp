@@ -13,7 +13,6 @@ RobotArm::RobotArm(QObject *parent) :
 
     homePosition();
     connect (this,SIGNAL(anglesUpdated()),this,SLOT(calculateCurrentPosition()));
-    connect (this,SIGNAL(updateTcpPosition(float,float,float,float,float,float)),this,SLOT(transformPositionToAngle(float,float,float,float,float,float)));
 }
 
 void RobotArm::homePosition()
@@ -32,11 +31,11 @@ void RobotArm::homePosition()
     ///////////////////////
 
 
-    m_theta1 = M_PI_2;
-    m_theta2 = M_PI_2;
-    m_theta3 = M_PI_2;
-    m_theta4 = M_PI_2;
-    m_theta5 = M_PI_2;
+    m_theta1 = 0;
+    m_theta2 = 0;
+    m_theta3 = 0;
+    m_theta4 = 0;
+    m_theta5 = 0;
     writeToTerminal("Koordinat-transformation resettet to home position");
 }
 
@@ -79,7 +78,6 @@ void RobotArm::calculateJakobiInv()
 
     Matrix jakobiInv(5,6,init);
     jakobiInv = jakobi.pseudo_inverse();
-
 
     for(int n = 0; n < 5; n++){
         for(int m = 0; m < 6; m++){
@@ -126,7 +124,7 @@ void RobotArm::calculateCurrentPosition()
     QMatrix4x4 T04=T01*T12*T23*T34;
     QMatrix4x4 T05=T01*T12*T23*T34*T45;
 
-    qDebug() << "\nTransformation-coordinatsystem 0 -> 5: " << cutMatrixValues(T05);
+    //qDebug() << "\n######### Transformation-coordinatsystem 0 -> 5: " << cutMatrixValues(T05);
 
     QVector3D P00(0,0,0);
     QVector3D P01(T01.column(3).toVector3D());
@@ -193,7 +191,7 @@ void RobotArm::calculateCurrentPosition()
 
 
     m_jakobi = jakobi;
-    qDebug() << m_jakobi;
+    //qDebug() << m_jakobi;
     calculateJakobiInv();
 
 
@@ -205,32 +203,40 @@ void RobotArm::calculateCurrentPosition()
     float wz = atan2(T05(1,0)/cos(wy), T05(0,0)/cos(wy));
     float wx = atan2(T05(2,1)/cos(wy), T05(2,2)/cos(wy));
 
-    m_currentTcpPose(0,0) = (float)((int)(x*100))/100;
-    m_currentTcpPose(1,0) = (float)((int)(y*100))/100;
-    m_currentTcpPose(2,0) = (float)((int)(z*100))/100;
-    m_currentTcpPose(3,0) = (float)((int)(wx*100))/100;
-    m_currentTcpPose(4,0) = (float)((int)(wy*100))/100;
-    m_currentTcpPose(5,0) = (float)((int)(wz*100))/100;
+    m_currentTcpPose(0,0) = (float)((int)(x*1000))/1000;
+    m_currentTcpPose(1,0) = (float)((int)(y*1000))/1000;
+    m_currentTcpPose(2,0) = (float)((int)(z*1000))/1000;
+    m_currentTcpPose(3,0) = (float)((int)(wx*1000))/1000;
+    m_currentTcpPose(4,0) = (float)((int)(wy*1000))/1000;
+    m_currentTcpPose(5,0) = (float)((int)(wz*1000))/1000;
 
     //qDebug() << "current tcpPose" << m_currentTcpPose;
 
     emit updateTcpPosition(m_currentTcpPose(0,0), m_currentTcpPose(1,0), m_currentTcpPose(2,0), m_currentTcpPose(3,0), m_currentTcpPose(4,0), m_currentTcpPose(5,0));
 }
 
-void RobotArm::transformPositionToAngle(float x, float y, float z, float wx, float wy, float wz)
+void RobotArm::transformPositionToAngle(float dx, float dy, float dz, float dwx, float dwy, float dwz)
 {
-    QGenericMatrix<1,6,float> wantedTcpPose;
-    wantedTcpPose(0,0)=x;
-    wantedTcpPose(1,0)=y;
-    wantedTcpPose(2,0)=z;
-    wantedTcpPose(3,0)=wx;
-    wantedTcpPose(4,0)=wy;
-    wantedTcpPose(5,0)=wz;
+    QGenericMatrix<1,6,float> deltaTcpPose;
+    deltaTcpPose(0,0)=dx;
+    deltaTcpPose(1,0)=dy;
+    deltaTcpPose(2,0)=dz;
+    deltaTcpPose(3,0)=dwx;
+    deltaTcpPose(4,0)=dwy;
+    deltaTcpPose(5,0)=dwz;
 
-    QGenericMatrix<1,5,float> searchedAngles = m_jakobiInv*wantedTcpPose;
+    QGenericMatrix<1,5,float> deltaAngles = m_jakobiInv*deltaTcpPose;
 
-    qDebug()<< "searched angles" << searchedAngles << "for tcp pose" << wantedTcpPose;
+//    deltaAngles(0,0)=(float)((int)(deltaAngles(0,0)*10000))/10000;
+//    deltaAngles(1,0)=(float)((int)(deltaAngles(1,0)*10000))/10000;
+//    deltaAngles(2,0)=(float)((int)(deltaAngles(2,0)*10000))/10000;
+//    deltaAngles(3,0)=(float)((int)(deltaAngles(3,0)*10000))/10000;
+//    deltaAngles(4,0)=(float)((int)(deltaAngles(4,0)*10000))/10000;
 
+
+    qDebug()<< "delta angles" << deltaAngles << "for delta tcp pose" << deltaTcpPose;
+
+    emit moveServo(deltaAngles(0,0),deltaAngles(1,0),deltaAngles(2,0),deltaAngles(3,0),deltaAngles(4,0));
 }
 
 void RobotArm::transformAngleToPosition(float theta1, float theta2, float theta3, float theta4, float theta5)
@@ -252,7 +258,7 @@ void RobotArm::updateAngles(float theta1, float theta2, float theta3, float thet
     m_currentAngles(3,0) = m_theta4;
     m_currentAngles(4,0) = m_theta5;
 
-    qDebug() << "current angles" << m_currentAngles;
+    //qDebug() << "current angles" << m_currentAngles;
     emit anglesUpdated();
 }
 

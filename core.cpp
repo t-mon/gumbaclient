@@ -19,6 +19,8 @@ Core::Core(QObject *parent) :
     connect(m_mainwindow,SIGNAL(connectServer(QString,QString)),m_client,SLOT(connectToHost(QString,QString)));
     connect(m_mainwindow,SIGNAL(disconnectServer()),m_client,SLOT(disconnectFromHost()));
     connect(m_mainwindow,SIGNAL(sendCommand(QString,QString)),m_client,SLOT(sendData(QString,QString)));
+    connect(m_mainwindow,SIGNAL(moveToPosition(float,float,float,float,float,float)),m_arm,SLOT(transformPositionToAngle(float,float,float,float,float,float)));
+
 
     connect(m_client,SIGNAL(writeToTerminal(QString)),m_mainwindow,SLOT(writeToTerminal(QString)));
     connect(m_client,SIGNAL(connectionStatusChanged(bool)),m_mainwindow,SLOT(connectionStatusChanged(bool)));
@@ -40,6 +42,7 @@ Core::Core(QObject *parent) :
 
     connect(m_arm,SIGNAL(writeToTerminal(QString)),m_mainwindow,SLOT(writeToTerminal(QString)));
     connect(m_arm,SIGNAL(updateTcpPosition(float,float,float,float,float,float)),m_mainwindow,SLOT(tcpPositionChanged(float,float,float,float,float,float)));
+    connect(m_arm,SIGNAL(moveServo(float,float,float,float,float)),m_mainwindow,SLOT(moveJoints(float,float,float,float,float)));
     connect(m_mainwindow,SIGNAL(calculatePosition(float,float,float,float,float)),m_arm,SLOT(updateAngles(float,float,float,float,float)));
 
     connect(m_gumbaMove,SIGNAL(writeToTerminal(QString)),m_mainwindow,SLOT(writeToTerminal(QString)));

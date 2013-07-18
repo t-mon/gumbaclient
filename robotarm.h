@@ -37,17 +37,19 @@ private:
 
 
 signals:
-    void moveServo();
+    void moveServo(float theta1, float theta2, float theta3, float theta4, float theta5);
     void anglesUpdated();
     void updateTcpPosition(const float &x, const float &y, const float &z, const float &wx, const float &wy, const float &wz);
 
     void writeToTerminal(const QString &terminalString);
 
+
+
 private slots:
 
     void calculateCurrentPosition();
 
-    void transformPositionToAngle(float x, float y, float z, float wx, float wy, float wz);
+    void transformPositionToAngle(float dx, float dy, float dz, float dwx, float dwy, float dwz);
     void transformAngleToPosition(float theta1, float theta2, float theta3, float theta4, float theta5);
 
 public slots:
