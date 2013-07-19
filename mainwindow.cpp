@@ -804,9 +804,9 @@ void MainWindow::toggleRTSClicked()
 
 void MainWindow::servo0SliderChanged(const int &pos)
 {
-    servo0Label->setText("S0 = " + QString::number((float)pos/100000 *180 /M_PI - 90));
     emit sendCommand("Servo0",QString::number(pos));
     m_angle0 = (float)pos/100000;
+    servo0Label->setText("S0 = " + QString::number(m_angle0*180 /M_PI - 90));
     m_visualisation->updateservo0(m_angle0 *180 /M_PI - 90);
     emit calculatePosition(m_angle0,m_angle1,m_angle2,m_angle3,m_angle4);
 
@@ -833,7 +833,7 @@ void MainWindow::servo1SliderChanged(const int &pos)
     servo1Label->setText("S1 = " + QString::number((float)pos/100000 *180 /M_PI - 90));
     emit sendCommand("Servo1",QString::number(pos));
     m_angle1 = (float)pos/100000;
-    m_visualisation->updateservo1(m_angle1 *180 /M_PI - 90);
+    m_visualisation->updateservo1(m_angle1 *180 /M_PI);
     emit calculatePosition(m_angle0,m_angle1,m_angle2,m_angle3,m_angle4);
 }
 
@@ -873,7 +873,7 @@ void MainWindow::servo2PowerOffClicked()
 
 void MainWindow::servo3SliderChanged(const int &pos)
 {
-    servo3Label->setText("S3 = " + QString::number((float)pos/100000 *180 /M_PI - 90));
+    servo3Label->setText("S3 = " + QString::number(((float)pos/100000 *180 /M_PI) - 90));
     emit sendCommand("Servo3",QString::number(pos));
     m_angle3 = (float)pos/100000;
     m_visualisation->updateservo3(m_angle3 *180 /M_PI - 90);

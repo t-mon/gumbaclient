@@ -283,39 +283,39 @@ void RobotVisualisation::drawCylinder(float radius, float height)
 
 
 
-void RobotVisualisation::updateservo0(int degree)
+void RobotVisualisation::updateservo0(float degree)
 {
-    servo0 = degree % 360;
+    servo0 = degree;
     updateGL();
 }
 
-void RobotVisualisation::updateservo1(int degree)
+void RobotVisualisation::updateservo1(float degree)
 {
-    servo1 = (degree +90) % 360;
+    servo1 = (degree);
     updateGL();
 }
 
-void RobotVisualisation::updateservo2(int degree)
+void RobotVisualisation::updateservo2(float degree)
 {
-    servo2 = (degree -90) % 360;
+    servo2 = (degree -90) ;
     updateGL();
 }
 
-void RobotVisualisation::updateservo3(int degree)
+void RobotVisualisation::updateservo3(float degree)
 {
-    servo3 = (degree -90) % 360;
+    servo3 = (degree -90);
     updateGL();
 }
 
-void RobotVisualisation::updateservo4(int degree)
+void RobotVisualisation::updateservo4(float degree)
 {
-    servo4 = degree % 360;
+    servo4 = degree;
     updateGL();
 }
 
-void RobotVisualisation::updateservo5(int degree)
+void RobotVisualisation::updateservo5(float degree)
 {
-    servo5 = degree % 360;
+    servo5 = degree;
     updateGL();
 }
 

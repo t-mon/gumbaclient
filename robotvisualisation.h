@@ -17,12 +17,12 @@ public slots:
     void setYRotation(int angle);
     void setZRotation(int angle);
 
-    void updateservo0(int degree);
-    void updateservo1(int degree);
-    void updateservo2(int degree);
-    void updateservo3(int degree);
-    void updateservo4(int degree);
-    void updateservo5(int degree);
+    void updateservo0(float degree);
+    void updateservo1(float degree);
+    void updateservo2(float degree);
+    void updateservo3(float degree);
+    void updateservo4(float degree);
+    void updateservo5(float degree);
 
     void zoomIn();
     void zoomOut();

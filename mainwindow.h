@@ -21,7 +21,7 @@
 #define downLimitBig 57
 #define upLimitSmall 227
 #define downLimitSmall 50
-#define periodMove 1500
+#define periodMove 2500
 
 namespace Ui {
 class MainWindow;
