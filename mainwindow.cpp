@@ -539,6 +539,21 @@ QGroupBox *MainWindow::createTcpControllGroupBox()
     QPushButton *zPlus = new QPushButton("z +",this);
     QPushButton *zMinus = new QPushButton("z -",this);
 
+    xPlus->setAutoRepeat(true);
+    xMinus->setAutoRepeat(true);
+    yPlus->setAutoRepeat(true);
+    yMinus->setAutoRepeat(true);
+    zPlus->setAutoRepeat(true);
+    zMinus->setAutoRepeat(true);
+
+    int delay= 20;
+    xPlus->setAutoRepeatInterval(delay);
+    xMinus->setAutoRepeatInterval(delay);
+    yPlus->setAutoRepeatInterval(delay);
+    yMinus->setAutoRepeatInterval(delay);
+    zPlus->setAutoRepeatInterval(delay);
+    zMinus->setAutoRepeatInterval(delay);
+
     tcpControllLayout->addWidget(xMinus,0,0);
     tcpControllLayout->addWidget(xPlus,0,1);
     tcpControllLayout->addWidget(yMinus,1,0);
@@ -1061,7 +1076,7 @@ void MainWindow::updateWiiMoteOrientation(const float &roll, const float &pitch,
     wiiMoteYaw->setText("Yaw = " + QString::number(yaw_i));
 
     if(m_wiiMoteABstate){
-        servo2Slider->setValue(pitch_i*(-1)+50);
+        servo2Slider->setValue((int)(pitch_i*(-1)+50)*M_PI*100000/180);
     }
 
 

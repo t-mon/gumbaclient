@@ -176,15 +176,20 @@ void RobotVisualisation::mouseMoveEvent(QMouseEvent *event)
 void RobotVisualisation::wheelEvent(QWheelEvent *event)
 {
     if(event->orientation()==Qt::Horizontal){
-        int dz=event->y() - lastPos.y();
-        qDebug() << "scroll horizontal";
         if(event->delta() > 0){
-            setZRotation(zRot + 10 * dz);
+            qDebug() << "scroll horizontal right";
+            zRot+=20;
+            setZRotation(zRot);
+            updateGL();
+            return;
         }
-        if(event->delta() > 0){
-            setZRotation(zRot - 10 * dz);
+        if(event->delta() < 0){
+            qDebug() << "scroll horizontal left";
+            zRot-=20;
+            setZRotation(zRot);
+            updateGL();
+            return;
         }
-        lastPos = event->pos();
     }
     if(event->orientation()==Qt::Vertical){
         //qDebug() << "scroll vertical" << event->delta();
