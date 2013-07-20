@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QMatrix4x4>
+#include <octave/oct.h>
 
 class RobotArm : public QObject
 {
@@ -13,7 +14,7 @@ public:
 private:
     void homePosition();
 
-    QGenericMatrix<1,5,float> m_currentAngles;
+    QGenericMatrix<1,6,float> m_currentAngles;
     QGenericMatrix<1,6,float> m_currentTcpPose;
 
     float m_theta1;
@@ -21,23 +22,25 @@ private:
     float m_theta3;
     float m_theta4;
     float m_theta5;
+    float m_theta6;
 
     QMatrix4x4 m_koordinateSystem_01;
     QMatrix4x4 m_koordinateSystem_12;
     QMatrix4x4 m_koordinateSystem_23;
     QMatrix4x4 m_koordinateSystem_34;
     QMatrix4x4 m_koordinateSystem_45;
+    QMatrix4x4 m_koordinateSystem_56;
 
     QMatrix4x4 cutMatrixValues(QMatrix4x4 matrix);
 
-    QGenericMatrix<5,6,float> m_jakobi;
-    QGenericMatrix<6,5,float> m_jakobiInv;
+    QGenericMatrix<6,6,float> m_jakobi;
+    QGenericMatrix<6,6,float> m_jakobiInv;
 
     void calculateJakobiInv();
 
 
 signals:
-    void moveServo(float theta1, float theta2, float theta3, float theta4, float theta5);
+    void moveServo(float theta1, float theta2, float theta3, float theta4, float theta5, float theta6);
     void anglesUpdated();
     void updateTcpPosition(const float &x, const float &y, const float &z, const float &wx, const float &wy, const float &wz);
 
@@ -50,10 +53,10 @@ private slots:
     void calculateCurrentPosition();
 
     void transformPositionToAngle(float dx, float dy, float dz, float dwx, float dwy, float dwz);
-    void transformAngleToPosition(float theta1, float theta2, float theta3, float theta4, float theta5);
+    void transformAngleToPosition(float theta1, float theta2, float theta3, float theta4, float theta5, float theta6);
 
 public slots:
-    void updateAngles(float theta1, float theta2, float theta3, float theta4, float theta5);
+    void updateAngles(float theta1, float theta2, float theta3, float theta4, float theta5, float theta6);
     
 };
 

@@ -17,10 +17,10 @@
 // down-limit big   = 57  ms = -90
 // up-limit small   = 227 ms = +90
 // down-limit small = 50  ms = -90
-#define upLimitBig 243
-#define downLimitBig 57
-#define upLimitSmall 227
-#define downLimitSmall 50
+//#define upLimitBig 243
+//#define downLimitBig 57
+//#define upLimitSmall 227
+//#define downLimitSmall 50
 #define periodMove 2500
 
 namespace Ui {
@@ -47,6 +47,7 @@ private:
     QGroupBox *createGumbaServerConnectionGroupBox();
     QGroupBox *createServoControllGroupBox();
     QGroupBox *createServoPositionGroupBox();
+    QGroupBox *createServoOrientationGroupBox();
     QGroupBox *createTcpControllGroupBox();
 
     QGroupBox *createTerminalGroupBox();
@@ -196,7 +197,7 @@ signals:
 
     void disconnectServer();
 
-    void calculatePosition(float theta1, float theta2, float theta3, float theta4, float theta5);
+    void calculatePosition(float theta1, float theta2, float theta3, float theta4, float theta5, float theta6);
     void moveToPosition(const float &x, const float &y, const float &z, const float &wx, const float &wy, const float &wz);
 
 
@@ -224,7 +225,7 @@ public slots:
     void tcpPositionChanged(const float &x, const float &y, const float &z, const float &wx, const float &wy, const float &wz);
 
     void moveServo(const int &servoNumber, const int &start, const int &end, const int &period);
-    void moveJoints(float theta1, float theta2, float theta3, float theta4, float theta5);
+    void moveJoints(float theta1, float theta2, float theta3, float theta4, float theta5, float theta6);
     void allSevosPwmOff();
 
 };

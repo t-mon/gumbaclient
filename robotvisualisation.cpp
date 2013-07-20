@@ -77,6 +77,7 @@ void RobotVisualisation::paintGL()
     glRotatef((GLfloat) servo0,0,0,1);
     drawKoordinateSystem();
     //L1
+    glColor3f(0.5,0.5,0.5);
     drawCylinder(m_l/30,m_l/10);
     glPushMatrix();
     glTranslatef (0,0,m_l/10);
@@ -88,18 +89,21 @@ void RobotVisualisation::paintGL()
 
     glPushMatrix();
     glRotatef(90,1,0,0);
-    glRotatef((GLfloat) servo1,0,0,1);
+    glRotatef((GLfloat) servo1-90,0,0,1);
     drawKoordinateSystem();
 
     //L2
     glPushMatrix();
-    glRotatef(90,0,1,0);
+    glRotatef(-90,1,0,0);
     glTranslatef (0,0,m_l/30);
+    glColor3f(0.5,0.5,0.5);
     drawCylinder(m_l/30,m_l/5);
 
     //Third joint (servo2)
     glTranslatef (0,0,m_l/5+m_l/30);
     glRotatef(-90,0,1,0);
+    glRotatef(90,1,0,0);
+    glRotatef(90,0,0,1);
     glPushMatrix();
     glColor3f(0.8,0.8,0.8);
     glutWireSphere(m_l/30,32,32);
@@ -109,36 +113,57 @@ void RobotVisualisation::paintGL()
     //L3
     glPushMatrix();
     glRotatef(90,0,1,0);
+    glRotatef(90,1,0,0);
     glTranslatef (0,0,m_l/30);
-    drawCylinder(m_l/30,m_l/5);
+    glColor3f(0.5,0.5,0.5);
+    drawCylinder(m_l/30,(m_l/10)-m_l/60);
 
     //Fourth joint (servo3)
-    glTranslatef (0,0,m_l/5+m_l/30);
-    glRotatef(-90,0,1,0);
+    glPushMatrix();
+    glTranslatef (0,0,(m_l/10)-m_l/60);
+    glColor3f(0.8,0.8,0.8);
+    drawCylinder(m_l/30,m_l/30);
+    glTranslatef (0,0,m_l/60);
+    glRotatef(90,0,0,1);
+    glRotatef((GLfloat) servo3,0,0,1);
+    drawKoordinateSystem();
+    glTranslatef (0,0,m_l/60);
+    glColor3f(0.5,0.5,0.5);
+    drawCylinder(m_l/30,(m_l/10)-m_l/60);
+
+    //Fith joint (servo4)
+    glTranslatef (0,0,(m_l/10)-m_l/60+m_l/30);
     glPushMatrix();
     glColor3f(0.8,0.8,0.8);
     glutWireSphere(m_l/30,32,32);
-    glRotatef((GLfloat) servo3+90,0,0,1);
+    glRotatef(-90,0,1,0);
+    glRotatef(-90,0,0,1);
+    glRotatef((GLfloat) servo4,0,0,1);
     drawKoordinateSystem();
 
-    //L4
-    glRotatef(90,0,1,0);
-//    glTranslatef (0,0,m_l/30);
-//    glPushMatrix();
-//    drawCylinder(m_l/30,m_l/15);
-
-    //Fith joint (servo4)
-    glTranslatef (0,0,m_l/30+m_l/30);
-    glRotatef(90,0,0,1);
+    //Sixth joint (servo5)
+    glRotatef(-90,1,0,0);
+    glTranslatef (0,0,m_l/30);
     glPushMatrix();
-    glRotatef((GLfloat)servo4,0,0,1);
     glColor3f(0.5,0.5,0.5);
-    glutWireCube(m_l/15);
+    drawCylinder(m_l/30,((m_l/10)-m_l/60)/4);
+    glTranslatef (0,0,((m_l/10)-m_l/60)/4);
+    glPushMatrix();
+    glColor3f(0.8,0.8,0.8);
+    drawCylinder(m_l/30,m_l/30);
+    glTranslatef (0,0,m_l/60);
+    glRotatef(180,0,0,1);
     drawKoordinateSystem();
+    glRotatef((GLfloat) servo5,0,0,1);
 
     //TCP
-    glTranslatef (0,0,m_l/15);
+    glTranslatef (0,0,m_l/60);
     glPushMatrix();
+    glColor3f(0.5,0.5,0.5);
+    drawCylinder(m_l/30,((m_l/10)-m_l/60)/4);
+    glTranslatef (0,0,((m_l/10)-m_l/60)/2);
+    glColor3f(0,1,0);
+    glutWireSphere(m_l/100,15,15);
     drawKoordinateSystem();
 
     glPopMatrix();
@@ -264,8 +289,6 @@ void RobotVisualisation::drawKoordinateSystem()
 
 void RobotVisualisation::drawCylinder(float radius, float height)
 {
-    glColor3f(0.5,0.5,0.5);
-
     int slices = 32;
 
     GLUquadricObj *quadratic;
