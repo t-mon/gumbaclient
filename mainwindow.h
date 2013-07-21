@@ -49,6 +49,7 @@ private:
     QGroupBox *createServoPositionGroupBox();
     QGroupBox *createServoOrientationGroupBox();
     QGroupBox *createTcpControllGroupBox();
+    QGroupBox *createTcpControllRotGroupBox();
 
     QGroupBox *createTerminalGroupBox();
     QWidget *createWiiMoteGroupBox();
@@ -66,13 +67,6 @@ private:
     QLabel *tcp_wx_Lable;
     QLabel *tcp_wy_Lable;
     QLabel *tcp_wz_Lable;
-
-
-    float convertPwmToDegreeBig(int pwm);
-    float convertPwmToDegreeSmall(int pwm);
-
-    int convertDegreeToPwmBig(float degree);
-    int convertDegreeToPwmSmall(float degree);
 
     QPropertyAnimation *animationServo0;
     QPropertyAnimation *animationServo1;
@@ -160,6 +154,7 @@ private slots:
     void servo5animationClicked();
     void servo5PowerOffClicked();
 
+    void updateAllAngles();
 
     void tcpXPlusClicked();
     void tcpXMinusClicked();
@@ -167,7 +162,12 @@ private slots:
     void tcpYMinusClicked();
     void tcpZPlusClicked();
     void tcpZMinusClicked();
-
+    void tcpWXPlusClicked();
+    void tcpWXMinusClicked();
+    void tcpWYPlusClicked();
+    void tcpWYMinusClicked();
+    void tcpWZPlusClicked();
+    void tcpWZMinusClicked();
 
     void initServoClicked();
     void servoHomePositionClicked();
@@ -199,7 +199,7 @@ signals:
 
     void calculatePosition(float theta1, float theta2, float theta3, float theta4, float theta5, float theta6);
     void moveToPosition(const float &x, const float &y, const float &z, const float &wx, const float &wy, const float &wz);
-
+    void koordinateSystemChanged(const int &system);
 
     void zoomIn();
     void zoomOut();

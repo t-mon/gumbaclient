@@ -24,12 +24,7 @@ private:
     float m_theta5;
     float m_theta6;
 
-    QMatrix4x4 m_koordinateSystem_01;
-    QMatrix4x4 m_koordinateSystem_12;
-    QMatrix4x4 m_koordinateSystem_23;
-    QMatrix4x4 m_koordinateSystem_34;
-    QMatrix4x4 m_koordinateSystem_45;
-    QMatrix4x4 m_koordinateSystem_56;
+    QMatrix4x4 m_transformationMatrix_06;
 
     QMatrix4x4 cutMatrixValues(QMatrix4x4 matrix);
 
@@ -38,6 +33,7 @@ private:
 
     void calculateJakobiInv();
 
+    int m_koordinateSystem;
 
 signals:
     void moveServo(float theta1, float theta2, float theta3, float theta4, float theta5, float theta6);
@@ -57,7 +53,7 @@ private slots:
 
 public slots:
     void updateAngles(float theta1, float theta2, float theta3, float theta4, float theta5, float theta6);
-    
+    void koordinateSystemChanged(const int &system);
 };
 
 #endif // ROBOTARM_H

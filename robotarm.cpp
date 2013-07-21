@@ -150,7 +150,9 @@ void RobotArm::calculateCurrentPosition()
     QMatrix4x4 T05=T01*T12*T23*T34*T45;
     QMatrix4x4 T06=T01*T12*T23*T34*T45*T56;
 
-    qDebug() << "\n######### Transformation-coordinatsystem 0 -> 6: " << cutMatrixValues(T06);
+    m_transformationMatrix_06 = T06;
+
+    //qDebug() << "\n######### Transformation-coordinatsystem 0 -> 6: " << cutMatrixValues(T06);
 
     QVector3D P00(0,0,0);
     QVector3D P01(T01.column(3).toVector3D());
@@ -247,6 +249,7 @@ void RobotArm::calculateCurrentPosition()
 
 void RobotArm::transformPositionToAngle(float dx, float dy, float dz, float dwx, float dwy, float dwz)
 {
+
     QGenericMatrix<1,6,float> deltaTcpPose;
     deltaTcpPose(0,0)=dx;
     deltaTcpPose(1,0)=dy;
@@ -254,6 +257,12 @@ void RobotArm::transformPositionToAngle(float dx, float dy, float dz, float dwx,
     deltaTcpPose(3,0)=dwx;
     deltaTcpPose(4,0)=dwy;
     deltaTcpPose(5,0)=dwz;
+
+    // 0 = Base
+    // 1 = TCP
+    if(m_koordinateSystem == 1){
+
+    }
 
     QGenericMatrix<1,6,float> deltaAngles = m_jakobiInv*deltaTcpPose;
 
@@ -263,7 +272,6 @@ void RobotArm::transformPositionToAngle(float dx, float dy, float dz, float dwx,
     deltaAngles(3,0)=(float)((int)(deltaAngles(3,0)*10000))/10000;
     deltaAngles(4,0)=(float)((int)(deltaAngles(4,0)*10000))/10000;
     deltaAngles(5,0)=(float)((int)(deltaAngles(5,0)*10000))/10000;
-
 
     //qDebug()<< "delta angles" << deltaAngles << "for delta tcp pose" << deltaTcpPose;
 
@@ -307,5 +315,11 @@ void RobotArm::updateAngles(float theta1, float theta2, float theta3, float thet
 
     //qDebug() << "current angles" << m_currentAngles;
     emit anglesUpdated();
+}
+
+void RobotArm::koordinateSystemChanged(const int &system)
+{
+    //qDebug() << "koordinatesystem changed to " << system;
+    m_koordinateSystem = system;
 }
 

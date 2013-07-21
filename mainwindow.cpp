@@ -6,6 +6,7 @@
 #include <QColor>
 #include <QDebug>
 #include <QKeyEvent>
+#include <QComboBox>
 #include <QIcon>
 #include <math.h>
 
@@ -16,10 +17,10 @@ MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent)
 {
     m_angle0 = M_PI_2;
-    m_angle1 = M_PI_2;
-    m_angle2 = M_PI_2;
+    m_angle1 = M_PI;
+    m_angle2 = M_PI_2+M_PI_2/2;
     m_angle3 = M_PI_2;
-    m_angle4 = M_PI_2;
+    m_angle4 = M_PI_2+M_PI_2/2;
     m_angle5 = M_PI_2;
 
     m_wiiMoteABstate = false;
@@ -44,7 +45,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(this,SIGNAL(zoomOut()),m_visualisation,SLOT(zoomOut()));
 
     emit calculatePosition(m_angle0,m_angle1,m_angle2,m_angle3,m_angle4,m_angle5);
-
+    updateAllAngles();
 }
 
 void MainWindow::keyPressEvent( QKeyEvent *event){
@@ -430,7 +431,20 @@ QGroupBox *MainWindow::createServoControllGroupBox()
     servoControllGrid->addWidget(buttons,0,1);
     servoControllGrid->addWidget(createServoPositionGroupBox(),1,1);
     servoControllGrid->addWidget(createServoOrientationGroupBox(),2,1);
-    servoControllGrid->addWidget(createTcpControllGroupBox(),3,1);
+
+    QWidget *moveKoordinateSystem = new QWidget(this);
+    QVBoxLayout *moveKoordinateSystemLayout = new QVBoxLayout(this);
+    moveKoordinateSystem->setLayout(moveKoordinateSystemLayout);
+    QLabel *systemLabel = new QLabel("Koordinatesystem",this);
+    QComboBox *box = new QComboBox(this);
+    box->addItem("Base",0);
+    box->addItem("TCP",0);
+    moveKoordinateSystemLayout->addWidget(systemLabel);
+    moveKoordinateSystemLayout->addWidget(box);
+
+    servoControllGrid->addWidget(moveKoordinateSystem,3,1);
+    servoControllGrid->addWidget(createTcpControllGroupBox(),4,1);
+    servoControllGrid->addWidget(createTcpControllRotGroupBox(),5,1);
 
     servoControllGrid->addWidget(servo0GroupBox,0,0);
     servoControllGrid->addWidget(servo1GroupBox,1,0);
@@ -464,6 +478,7 @@ QGroupBox *MainWindow::createServoControllGroupBox()
     connect(servo4poweOffButton,SIGNAL(clicked()),this,SLOT(servo4PowerOffClicked()));
     connect(servo5poweOffButton,SIGNAL(clicked()),this,SLOT(servo5PowerOffClicked()));
 
+    connect(box,SIGNAL(activated(int)),this,SIGNAL(koordinateSystemChanged(int)));
     return servoControllGroupBox;
 }
 
@@ -525,7 +540,7 @@ QGroupBox *MainWindow::createServoOrientationGroupBox()
 
 QGroupBox *MainWindow::createTcpControllGroupBox()
 {
-    QGroupBox *tcpControllGroupBox = new QGroupBox(tr("Move Base-KS"),this);
+    QGroupBox *tcpControllGroupBox = new QGroupBox(tr("Translation"),this);
     QGridLayout *tcpControllLayout = new QGridLayout(this);
     tcpControllGroupBox->setLayout(tcpControllLayout);
 
@@ -558,15 +573,71 @@ QGroupBox *MainWindow::createTcpControllGroupBox()
     tcpControllLayout->addWidget(zMinus,2,0);
     tcpControllLayout->addWidget(zPlus,2,1);
 
+    xPlus->setFixedWidth(50);
+    xMinus->setFixedWidth(50);
+    yPlus->setFixedWidth(50);
+    yMinus->setFixedWidth(50);
     zPlus->setFixedWidth(50);
     zMinus->setFixedWidth(50);
 
     connect(xPlus,SIGNAL(clicked()),this,SLOT(tcpXPlusClicked()));
-    connect(xMinus,SIGNAL(clicked()),this,SLOT(tcpXMinusClicked()));connect(zPlus,SIGNAL(clicked()),this,SLOT(tcpZPlusClicked()));
+    connect(xMinus,SIGNAL(clicked()),this,SLOT(tcpXMinusClicked()));
     connect(yMinus,SIGNAL(clicked()),this,SLOT(tcpYMinusClicked()));
     connect(yPlus,SIGNAL(clicked()),this,SLOT(tcpYPlusClicked()));
     connect(zMinus,SIGNAL(clicked()),this,SLOT(tcpZMinusClicked()));
     connect(zPlus,SIGNAL(clicked()),this,SLOT(tcpZPlusClicked()));
+
+    return tcpControllGroupBox;
+}
+
+QGroupBox *MainWindow::createTcpControllRotGroupBox()
+{
+    QGroupBox *tcpControllGroupBox = new QGroupBox(tr("Rotation"),this);
+    QGridLayout *tcpControllLayout = new QGridLayout(this);
+    tcpControllGroupBox->setLayout(tcpControllLayout);
+
+    QPushButton *wxPlus = new QPushButton("wx +",this);
+    QPushButton *wxMinus = new QPushButton("wx -",this);
+    QPushButton *wyPlus = new QPushButton("wy +",this);
+    QPushButton *wyMinus = new QPushButton("wy -",this);
+    QPushButton *wzPlus = new QPushButton("wz +",this);
+    QPushButton *wzMinus = new QPushButton("wz -",this);
+
+    wxPlus->setAutoRepeat(true);
+    wxMinus->setAutoRepeat(true);
+    wyPlus->setAutoRepeat(true);
+    wyMinus->setAutoRepeat(true);
+    wzPlus->setAutoRepeat(true);
+    wzMinus->setAutoRepeat(true);
+
+    int delay= 20;
+    wxPlus->setAutoRepeatInterval(delay);
+    wxMinus->setAutoRepeatInterval(delay);
+    wyPlus->setAutoRepeatInterval(delay);
+    wyMinus->setAutoRepeatInterval(delay);
+    wzPlus->setAutoRepeatInterval(delay);
+    wzMinus->setAutoRepeatInterval(delay);
+
+    tcpControllLayout->addWidget(wxMinus,0,0);
+    tcpControllLayout->addWidget(wxPlus,0,1);
+    tcpControllLayout->addWidget(wyMinus,1,0);
+    tcpControllLayout->addWidget(wyPlus,1,1);
+    tcpControllLayout->addWidget(wzMinus,2,0);
+    tcpControllLayout->addWidget(wzPlus,2,1);
+
+    wxPlus->setFixedWidth(50);
+    wxMinus->setFixedWidth(50);
+    wyPlus->setFixedWidth(50);
+    wyMinus->setFixedWidth(50);
+    wzPlus->setFixedWidth(50);
+    wzMinus->setFixedWidth(50);
+
+    connect(wxPlus,SIGNAL(clicked()),this,SLOT(tcpWXPlusClicked()));
+    connect(wxMinus,SIGNAL(clicked()),this,SLOT(tcpWXMinusClicked()));
+    connect(wyMinus,SIGNAL(clicked()),this,SLOT(tcpWYMinusClicked()));
+    connect(wyPlus,SIGNAL(clicked()),this,SLOT(tcpWYPlusClicked()));
+    connect(wzMinus,SIGNAL(clicked()),this,SLOT(tcpWZMinusClicked()));
+    connect(wzPlus,SIGNAL(clicked()),this,SLOT(tcpWZPlusClicked()));
 
     return tcpControllGroupBox;
 }
@@ -745,31 +816,6 @@ QWidget *MainWindow::createWiiMoteGroupBox()
     return wiiWidget;
 }
 
-float MainWindow::convertPwmToDegreeBig(int pwm)
-{
-    // up-limit     = 249 ms = +90
-    // down-limit   = 57  ms = -90
-    //return (180*(pwm-downLimitBig)/(upLimitBig-downLimitBig))-90;
-}
-
-float MainWindow::convertPwmToDegreeSmall(int pwm)
-{
-    // up-limit     = 249 ms = +90
-    // down-limit   = 57  ms = -90
-    //return (180*(pwm-downLimitSmall)/(upLimitSmall-downLimitSmall))-90;
-}
-
-int MainWindow::convertDegreeToPwmBig(float degree)
-{
-    //return ((degree-90)*(upLimitBig-downLimitBig)-(180*downLimitBig))/180;
-}
-
-int MainWindow::convertDegreeToPwmSmall(float degree)
-{
-    //return ((degree-90)*(upLimitSmall-downLimitSmall)-(180*downLimitSmall))/180;
-}
-
-
 void MainWindow::connectServerClicked(){
     emit connectServer(hostLineEdit->text(),portLineEdit->text());
 }
@@ -926,6 +972,16 @@ void MainWindow::servo5PowerOffClicked()
     emit sendCommand("Servo5",QString::number(0));
 }
 
+void MainWindow::updateAllAngles()
+{
+    m_visualisation->updateservo0(m_angle0 *180 /M_PI - 90);
+    m_visualisation->updateservo1(m_angle1 *180 /M_PI - 90);
+    m_visualisation->updateservo2(m_angle2 *180 /M_PI - 90);
+    m_visualisation->updateservo3(m_angle3 *180 /M_PI - 90);
+    m_visualisation->updateservo4(m_angle4 *180 /M_PI - 90);
+    m_visualisation->updateservo5(m_angle5 *180 /M_PI - 90);
+}
+
 void MainWindow::tcpXPlusClicked()
 {
     emit moveToPosition(1,0,0,0,0,0);
@@ -954,6 +1010,36 @@ void MainWindow::tcpZPlusClicked()
 void MainWindow::tcpZMinusClicked()
 {
     emit moveToPosition(0,0,-1,0,0,0);
+}
+
+void MainWindow::tcpWXPlusClicked()
+{
+    emit moveToPosition(0,0,0,M_PI/180,0,0);
+}
+
+void MainWindow::tcpWXMinusClicked()
+{
+    emit moveToPosition(0,0,0,-M_PI/180,0,0);
+}
+
+void MainWindow::tcpWYPlusClicked()
+{
+    emit moveToPosition(0,0,0,0,M_PI/180,0);
+}
+
+void MainWindow::tcpWYMinusClicked()
+{
+    emit moveToPosition(0,0,0,0,-M_PI/180,0);
+}
+
+void MainWindow::tcpWZPlusClicked()
+{
+    emit moveToPosition(0,0,0,0,0,M_PI/180);
+}
+
+void MainWindow::tcpWZMinusClicked()
+{
+    emit moveToPosition(0,0,0,0,0,-M_PI/180);
 }
 
 void MainWindow::allSevosPwmOff()
@@ -1053,10 +1139,10 @@ void MainWindow::initServoClicked()
 void MainWindow::servoHomePositionClicked()
 {
     moveServo(0,(m_angle0*100000),M_PI_2*100000,periodMove);
-    moveServo(1,(m_angle1*100000),M_PI_2*100000,periodMove);
-    moveServo(2,(m_angle2*100000),M_PI_2*100000,periodMove);
+    moveServo(1,(m_angle1*100000),M_PI*100000,periodMove);
+    moveServo(2,(m_angle2*100000),M_PI_2+M_PI_2/2*100000,periodMove);
     moveServo(3,(m_angle3*100000),M_PI_2*100000,periodMove);
-    moveServo(4,(m_angle4*100000),M_PI_2*100000,periodMove);
+    moveServo(4,(m_angle4*100000),M_PI_2+M_PI_2/2*100000,periodMove);
     moveServo(5,(m_angle5*100000),M_PI_2*100000,periodMove);
 
 }
